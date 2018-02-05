@@ -68,7 +68,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bluebird@^3.5.20", "@types/bluebird@^3.5.8":
+"@types/bluebird@*", "@types/bluebird@^3.5.20", "@types/bluebird@^3.5.8":
   version "3.5.20"
   resolved "http://localhost:4873/@types%2fbluebird/-/bluebird-3.5.20.tgz#f6363172add6f4eabb8cada53ca9af2781e8d6a1"
 
@@ -169,6 +169,13 @@
 "@types/inflection@^1.5.28":
   version "1.5.28"
   resolved "http://localhost:4873/@types%2finflection/-/inflection-1.5.28.tgz#43d55e0d72cf333a2dffd9c4ec0407455a1b0931"
+
+"@types/knex@^0.0.57":
+  version "0.0.57"
+  resolved "http://localhost:4873/@types%2fknex/-/knex-0.0.57.tgz#fb4440494c585109e44507606724f16289480fa2"
+  dependencies:
+    "@types/bluebird" "*"
+    "@types/node" "*"
 
 "@types/lodash@^4.14.100", "@types/lodash@^4.14.76":
   version "4.14.100"
@@ -307,6 +314,15 @@ ajv@^4.9.1:
   dependencies:
     co "^4.6.0"
     json-stable-stringify "^1.0.1"
+
+ajv@^5.1.1:
+  version "5.5.2"
+  resolved "http://localhost:4873/ajv/-/ajv-5.5.2.tgz#73b5eeca3fab653e3d3f9422b341ad42205dc965"
+  dependencies:
+    co "^4.6.0"
+    fast-deep-equal "^1.0.0"
+    fast-json-stable-stringify "^2.0.0"
+    json-schema-traverse "^0.3.0"
 
 align-text@^0.1.1, align-text@^0.1.3:
   version "0.1.4"
@@ -1175,7 +1191,7 @@ babel-register@^6.26.0, babel-register@^6.9.0:
     mkdirp "^0.5.1"
     source-map-support "^0.4.15"
 
-babel-runtime@^6.18.0, babel-runtime@^6.22.0, babel-runtime@^6.23.0, babel-runtime@^6.26.0:
+babel-runtime@^6.11.6, babel-runtime@^6.18.0, babel-runtime@^6.22.0, babel-runtime@^6.23.0, babel-runtime@^6.26.0:
   version "6.26.0"
   resolved "http://localhost:4873/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
   dependencies:
@@ -1265,7 +1281,7 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
-bluebird@^3.0.0, bluebird@^3.4.6, bluebird@^3.4.7, bluebird@^3.5.1:
+bluebird@^3.0.0, bluebird@^3.4.6, bluebird@^3.4.7, bluebird@^3.5.0, bluebird@^3.5.1:
   version "3.5.1"
   resolved "http://localhost:4873/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
@@ -2105,7 +2121,7 @@ delegates@^1.0.0:
   version "1.0.0"
   resolved "http://localhost:4873/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
 
-denali-cli@0.0.x:
+denali-cli@0.0.x, denali-cli@^0.0.x:
   version "0.0.20"
   resolved "http://localhost:4873/denali-cli/-/denali-cli-0.0.20.tgz#34cc19dfd48539c38a0a389decdd753ff27ac587"
   dependencies:
@@ -2169,7 +2185,21 @@ denali-cli@0.0.x:
     walk-sync "^0.3.2"
     yargs "^11.0.0"
 
-denali-typescript@^0.0.9:
+denali-objection@^0.0.4:
+  version "0.0.4"
+  resolved "http://localhost:4873/denali-objection/-/denali-objection-0.0.4.tgz#a407317b09c96b16c639bbc6ec9d54bb5f7e1ae1"
+  dependencies:
+    "@types/knex" "^0.0.57"
+    bluebird "^3.4.6"
+    denali "^0.0.x"
+    denali-cli "^0.0.x"
+    denali-typescript "^0.0.x"
+    knex "^0.13.0"
+    lodash "^4.16.4"
+    objection "^0.8.7"
+    typescript "^2.4.2"
+
+denali-typescript@^0.0.9, denali-typescript@^0.0.x:
   version "0.0.9"
   resolved "http://localhost:4873/denali-typescript/-/denali-typescript-0.0.9.tgz#8cc2404977569bee6f8e21091b602886612a5f67"
   dependencies:
@@ -2186,7 +2216,7 @@ denali-typescript@^0.0.9:
     resolve "^1.4.0"
     returnof "^1.1.1"
 
-denali@0.0.x:
+denali@0.0.x, denali@^0.0.x:
   version "0.0.41"
   resolved "http://localhost:4873/denali/-/denali-0.0.41.tgz#aaff576538c6f2e016a95a871f9768d7ece176fe"
   dependencies:
@@ -2537,9 +2567,17 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "http://localhost:4873/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
 
+fast-deep-equal@^1.0.0:
+  version "1.0.0"
+  resolved "http://localhost:4873/fast-deep-equal/-/fast-deep-equal-1.0.0.tgz#96256a3bc975595eb36d82e9929d060d893439ff"
+
 fast-diff@^1.1.1:
   version "1.1.2"
   resolved "http://localhost:4873/fast-diff/-/fast-diff-1.1.2.tgz#4b62c42b8e03de3f848460b639079920695d0154"
+
+fast-json-stable-stringify@^2.0.0:
+  version "2.0.0"
+  resolved "http://localhost:4873/fast-json-stable-stringify/-/fast-json-stable-stringify-2.0.0.tgz#d5142c0caee6b1189f87d3a76111064f86c8bbf2"
 
 fast-ordered-set@^1.0.0, fast-ordered-set@^1.0.2:
   version "1.0.3"
@@ -2830,6 +2868,10 @@ gauge@~2.7.3:
     string-width "^1.0.1"
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
+
+generic-pool@^2.4.2:
+  version "2.5.4"
+  resolved "http://localhost:4873/generic-pool/-/generic-pool-2.5.4.tgz#38c6188513e14030948ec6e5cf65523d9779299b"
 
 generic-pool@^3.1.7:
   version "3.4.1"
@@ -3289,6 +3331,10 @@ inquirer@^3.3.0:
     strip-ansi "^4.0.0"
     through "^2.3.6"
 
+interpret@^0.6.5:
+  version "0.6.6"
+  resolved "http://localhost:4873/interpret/-/interpret-0.6.6.tgz#fecd7a18e7ce5ca6abfb953e1f86213a49f1625b"
+
 interpret@^1.0.4:
   version "1.1.0"
   resolved "http://localhost:4873/interpret/-/interpret-1.1.0.tgz#7ed1b1410c6a0e0f78cf95d3b8440c63f78b8614"
@@ -3686,6 +3732,10 @@ json-parse-better-errors@^1.0.1:
   version "1.0.1"
   resolved "http://localhost:4873/json-parse-better-errors/-/json-parse-better-errors-1.0.1.tgz#50183cd1b2d25275de069e9e71b467ac9eab973a"
 
+json-schema-traverse@^0.3.0:
+  version "0.3.1"
+  resolved "http://localhost:4873/json-schema-traverse/-/json-schema-traverse-0.3.1.tgz#349a6d44c53a51de89b40805c5d5e59b417d3340"
+
 json-schema@0.2.3:
   version "0.2.3"
   resolved "http://localhost:4873/json-schema/-/json-schema-0.2.3.tgz#b480c892e59a2f05954ce727bd3f2a4e882f9e13"
@@ -3765,6 +3815,29 @@ klaw@^1.0.0:
   optionalDependencies:
     graceful-fs "^4.1.9"
 
+knex@^0.13.0:
+  version "0.13.0"
+  resolved "http://localhost:4873/knex/-/knex-0.13.0.tgz#08dd494f6bb64928934eec9dac34787a14ca5fa4"
+  dependencies:
+    babel-runtime "^6.11.6"
+    bluebird "^3.4.6"
+    chalk "^1.0.0"
+    commander "^2.2.0"
+    debug "^2.1.3"
+    generic-pool "^2.4.2"
+    inherits "~2.0.1"
+    interpret "^0.6.5"
+    liftoff "~2.2.0"
+    lodash "^4.6.0"
+    minimist "~1.1.0"
+    mkdirp "^0.5.0"
+    pg-connection-string "^0.1.3"
+    readable-stream "^1.1.12"
+    safe-buffer "^5.0.1"
+    tildify "~1.0.0"
+    uuid "^3.0.0"
+    v8flags "^2.0.2"
+
 knex@^0.14.2:
   version "0.14.2"
   resolved "http://localhost:4873/knex/-/knex-0.14.2.tgz#f3b3fe1ea0711af842770100768af21bfcbcbaea"
@@ -3827,6 +3900,16 @@ liftoff@2.3.0:
     lodash.isplainobject "^4.0.4"
     lodash.isstring "^4.0.1"
     lodash.mapvalues "^4.4.0"
+    rechoir "^0.6.2"
+    resolve "^1.1.7"
+
+liftoff@~2.2.0:
+  version "2.2.5"
+  resolved "http://localhost:4873/liftoff/-/liftoff-2.2.5.tgz#998c2876cff484b103e4423b93d356da44734c91"
+  dependencies:
+    extend "^3.0.0"
+    findup-sync "^0.4.2"
+    flagged-respawn "^0.3.2"
     rechoir "^0.6.2"
     resolve "^1.1.7"
 
@@ -4330,6 +4413,10 @@ minimist@~0.0.1:
   version "0.0.10"
   resolved "http://localhost:4873/minimist/-/minimist-0.0.10.tgz#de3f98543dbf96082be48ad1a0c7cda836301dcf"
 
+minimist@~1.1.0:
+  version "1.1.3"
+  resolved "http://localhost:4873/minimist/-/minimist-1.1.3.tgz#3bedfd91a92d39016fcfaa1c681e8faa1a1efda8"
+
 mixin-deep@^1.2.0:
   version "1.3.0"
   resolved "http://localhost:4873/mixin-deep/-/mixin-deep-1.3.0.tgz#47a8732ba97799457c8c1eca28f95132d7e8150a"
@@ -4386,6 +4473,10 @@ nan@^2.3.0:
   version "2.8.0"
   resolved "http://localhost:4873/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
 
+nan@~2.7.0:
+  version "2.7.0"
+  resolved "http://localhost:4873/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
+
 nanomatch@^1.2.5:
   version "1.2.7"
   resolved "http://localhost:4873/nanomatch/-/nanomatch-1.2.7.tgz#53cd4aa109ff68b7f869591fdc9d10daeeea3e79"
@@ -4420,7 +4511,7 @@ node-dir@0.1.8:
   version "0.1.8"
   resolved "http://localhost:4873/node-dir/-/node-dir-0.1.8.tgz#55fb8deb699070707fb67f91a460f0448294c77d"
 
-node-pre-gyp@^0.6.39:
+node-pre-gyp@^0.6.39, node-pre-gyp@~0.6.38:
   version "0.6.39"
   resolved "http://localhost:4873/node-pre-gyp/-/node-pre-gyp-0.6.39.tgz#c00e96860b23c0e1420ac7befc5044e1d78d8649"
   dependencies:
@@ -4553,6 +4644,14 @@ object.pick@^1.2.0, object.pick@^1.3.0:
   resolved "http://localhost:4873/object.pick/-/object.pick-1.3.0.tgz#87a10ac4c1694bd2e1cbf53591a66141fb5dd747"
   dependencies:
     isobject "^3.0.1"
+
+objection@^0.8.7:
+  version "0.8.9"
+  resolved "http://localhost:4873/objection/-/objection-0.8.9.tgz#490bc3ad84fbad1f79830814b8b593d03034a102"
+  dependencies:
+    ajv "^5.1.1"
+    bluebird "^3.5.0"
+    lodash "^4.17.4"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -4788,6 +4887,10 @@ pg-connection-string@2.0.0:
   version "2.0.0"
   resolved "http://localhost:4873/pg-connection-string/-/pg-connection-string-2.0.0.tgz#3eefe5997e06d94821e4d502e42b6a1c73f8df82"
 
+pg-connection-string@^0.1.3:
+  version "0.1.3"
+  resolved "http://localhost:4873/pg-connection-string/-/pg-connection-string-0.1.3.tgz#da1847b20940e42ee1492beaf65d49d91b245df7"
+
 pify@^2.0.0:
   version "2.3.0"
   resolved "http://localhost:4873/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
@@ -4998,6 +5101,15 @@ readable-stream@2.3.3, readable-stream@^2.0.2, readable-stream@^2.0.6, readable-
     safe-buffer "~5.1.1"
     string_decoder "~1.0.3"
     util-deprecate "~1.0.1"
+
+readable-stream@^1.1.12:
+  version "1.1.14"
+  resolved "http://localhost:4873/readable-stream/-/readable-stream-1.1.14.tgz#7cf4c54ef648e3813084c636dd2079e166c081d9"
+  dependencies:
+    core-util-is "~1.0.0"
+    inherits "~2.0.1"
+    isarray "0.0.1"
+    string_decoder "~0.10.x"
 
 readable-stream@~1.0.2:
   version "1.0.34"
@@ -5503,6 +5615,13 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "http://localhost:4873/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
 
+sqlite3@^3.1.13:
+  version "3.1.13"
+  resolved "http://localhost:4873/sqlite3/-/sqlite3-3.1.13.tgz#d990a05627392768de6278bafd1a31fdfe907dd9"
+  dependencies:
+    nan "~2.7.0"
+    node-pre-gyp "~0.6.38"
+
 sshpk@^1.7.0:
   version "1.13.1"
   resolved "http://localhost:4873/sshpk/-/sshpk-1.13.1.tgz#512df6da6287144316dc4c18fe1cf1d940739be3"
@@ -5750,6 +5869,12 @@ tildify@1.2.0:
   dependencies:
     os-homedir "^1.0.0"
 
+tildify@~1.0.0:
+  version "1.0.0"
+  resolved "http://localhost:4873/tildify/-/tildify-1.0.0.tgz#2a021db5e8fbde0a8f8b4df37adaa8fb1d39d7dd"
+  dependencies:
+    user-home "^1.0.0"
+
 time-zone@^1.0.0:
   version "1.0.0"
   resolved "http://localhost:4873/time-zone/-/time-zone-1.0.0.tgz#99c5bf55958966af6d06d83bdf3800dc82faec5d"
@@ -5875,7 +6000,7 @@ type-is@^1.6.15, type-is@~1.6.15:
     media-typer "0.3.0"
     mime-types "~2.1.15"
 
-typescript@^2.7.1:
+typescript@^2.4.2, typescript@^2.7.1:
   version "2.7.1"
   resolved "http://localhost:4873/typescript/-/typescript-2.7.1.tgz#bb3682c2c791ac90e7c6210b26478a8da085c359"
 
@@ -5993,6 +6118,10 @@ use@^2.0.0:
     isobject "^3.0.0"
     lazy-cache "^2.0.2"
 
+user-home@^1.0.0, user-home@^1.1.1:
+  version "1.1.1"
+  resolved "http://localhost:4873/user-home/-/user-home-1.1.1.tgz#2b5be23a32b63a7c9deb8d0f28d485724a3df190"
+
 username-sync@1.0.1:
   version "1.0.1"
   resolved "http://localhost:4873/username-sync/-/username-sync-1.0.1.tgz#1cde87eefcf94b8822984d938ba2b797426dae1f"
@@ -6008,6 +6137,12 @@ utils-merge@1.0.1:
 uuid@^3.0.0, uuid@^3.1.0:
   version "3.2.1"
   resolved "http://localhost:4873/uuid/-/uuid-3.2.1.tgz#12c528bb9d58d0b9265d9a2f6f0fe8be17ff1f14"
+
+v8flags@^2.0.2:
+  version "2.1.1"
+  resolved "http://localhost:4873/v8flags/-/v8flags-2.1.1.tgz#aab1a1fa30d45f88dd321148875ac02c0b55e5b4"
+  dependencies:
+    user-home "^1.1.1"
 
 v8flags@^3.0.0:
   version "3.0.1"

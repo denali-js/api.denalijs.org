@@ -21,6 +21,13 @@ export default function environmentConfig(environment: string) {
 
   if (environment === 'development') {
     // development-specific config
+    config.database = {
+      client: 'sqlite3',
+      useNullAsDefault: true,
+      connection: {
+        filename: '.data/development.db'
+      }
+    };
   }
 
   if (environment === 'production') {
