@@ -13,15 +13,13 @@
     "bluebird": "^3.5.1",
     "denali": "0.0.x",
     "denali-cli": "0.0.x",
-    "lodash": "^4.17.4"
+    "denali-typescript": "^0.0.9",
+    "lodash": "^4.17.4",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.1"
   },
   "devDependencies": {
-    "ava": "^0.25.0",
-    "babel-eslint": "^8.2.1",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
-    "denali-babel": "0.0.x",
-    "denali-eslint": "0.0.x"
+    "ava": "^0.25.0"
   },
   "ava": {
     "plugins": [],

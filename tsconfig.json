@@ -1,0 +1,28 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "target": "ES2017",
+      "noImplicitAny": true,
+      "sourceMap": false,
+      "importHelpers": true,
+      "inlineSourceMap": true,
+      "inlineSources": true,
+      "outDir": "dist",
+      "skipLibCheck": true,
+      "sourceRoot": ".",
+      "noUnusedLocals": true,
+      "baseUrl": "."
+  },
+  "include": [
+    "lib/**/*",
+    "app/**/*",
+    "blueprints/*/index.ts",
+    "commands/**/*",
+    "config/**/*",
+    "test/**/*"
+  ],
+  "exclude": [ "blueprints/*/files/**" ]
+}
+
