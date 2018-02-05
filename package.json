@@ -1,0 +1,30 @@
+{
+  "name": "website",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "denali server",
+    "test": "denali test"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=7.6.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "denali": "0.0.x",
+    "denali-cli": "0.0.x",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "babel-eslint": "^8.2.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "denali-babel": "0.0.x",
+    "denali-eslint": "0.0.x"
+  },
+  "ava": {
+    "plugins": [],
+    "presets": []
+  }
+}
