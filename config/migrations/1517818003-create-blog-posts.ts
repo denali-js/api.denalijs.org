@@ -5,6 +5,7 @@ export async function up(knex: Knex) {
     post.increments('id');
     post.text('title');
     post.text('body');
+    post.timestamps();
   });
 }
 

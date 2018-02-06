@@ -10,13 +10,22 @@
     "node": ">=7.6.0"
   },
   "dependencies": {
+    "@types/node-fetch": "^1.6.7",
+    "@types/tar": "^4.0.0",
+    "@types/tmp": "^0.0.33",
     "bluebird": "^3.5.1",
     "denali": "0.0.x",
     "denali-cli": "0.0.x",
     "denali-objection": "^0.0.4",
     "denali-typescript": "^0.0.9",
+    "follow": "^1.0.0",
     "lodash": "^4.17.4",
+    "node-fetch": "^2.0.0",
+    "npm-keyword": "^5.0.0",
+    "package-json": "^4.0.1",
     "pg": "^7.4.1",
+    "tar": "^4.3.2",
+    "tmp": "^0.0.33",
     "tslint": "^5.9.1",
     "typescript": "^2.7.1"
   },
