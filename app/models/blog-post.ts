@@ -1,8 +1,11 @@
-import { /*  attr, hasOne, hasMany */ } from 'denali';
+import { attr } from 'denali';
 import ApplicationModel from './application';
 
 export default class BlogPost extends ApplicationModel {
 
-  static schema = {};
+  static schema = {
+    title: attr('string'),
+    body: attr('string')
+  };
 
 }

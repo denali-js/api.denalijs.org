@@ -8,12 +8,9 @@ export default function environmentConfig(environment: string) {
     // If you are planning on using migrations with your database, uncomment this
     // section and provide the relevant database driver and connection details
     //
-    // migrations: {
-    //   db: {
-    //     client: 'pg',
-    //     connection: {}
-    //   }
-    // },
+    migrations: {
+      db: { }
+    },
     database: {
 
     }
@@ -28,6 +25,20 @@ export default function environmentConfig(environment: string) {
         filename: '.data/development.db'
       }
     };
+    config.migrations.db = config.database;
+  }
+
+  if (environment === 'test') {
+    config.database = {
+      client: 'pg',
+      useNullAsDefault: true,
+      connection: {
+        host: 'localhost',
+        user: 'postgres',
+        database: 'denali-website'
+      }
+    };
+    config.migrations.db = config.database;
   }
 
   if (environment === 'production') {

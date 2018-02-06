@@ -5,7 +5,7 @@ export default class DestroyBlogPost extends ApplicationAction {
 
   async respond({ params }: { params: { id: string | number } }) {
     let blogPost = await BlogPost.find(params.id);
-    await blogPost.destroy();
+    await blogPost.delete();
     this.render(204);
   }
 
