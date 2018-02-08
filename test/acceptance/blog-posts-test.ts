@@ -1,10 +1,9 @@
 import { setupAcceptanceTest } from 'denali';
+import setupApp from '../helpers/setup-app';
 
 const test = setupAcceptanceTest();
 
-test.beforeEach(async (t) => {
-  t.context.app.setHeader('content-type', 'application/vnd.api+json');
-});
+setupApp(test);
 
 test('POST /blog-posts > creates a blog post', async (t) => {
   let result = await t.context.app.post('/blog-posts', {

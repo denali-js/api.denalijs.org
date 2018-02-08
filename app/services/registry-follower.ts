@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { createReadStream as readStream, existsSync as exists } from 'fs';
-import { Service, Logger, lookup } from 'denali';
+import { Service, Logger, lookup, ConfigService } from 'denali';
 import { difference } from 'lodash';
 import * as follow from 'follow';
 import * as npmKeyword from 'npm-keyword';
@@ -29,6 +29,7 @@ export default class RegistryFollowerService extends Service {
 
   logger = lookup<Logger>('app:logger');
   files = lookup<FilesService>('service:files');
+  config = lookup<ConfigService>('service:config');
 
   constructor() {
     super();
@@ -39,12 +40,18 @@ export default class RegistryFollowerService extends Service {
     this.logger.info('Starting registry follower');
     let lastSequence = await this.getLastSequence();
     this.logger.info(`Last sequence: ${ lastSequence }`);
-    follow({ db: this.registryURL, since: lastSequence }, (error: Error, change: Change) => {
-      if (error) {
-        return this.logger.error(error.stack || error.message || error);
-      }
-      this.handleChange(change);
-    });
+    this.startFollower(lastSequence);
+  }
+
+  startFollower(lastSequence: string | number) {
+    // if (this.config.environment !== 'test') {
+      follow({ db: this.registryURL, since: lastSequence }, (error: Error, change: Change) => {
+        if (error) {
+          return this.logger.error(error.stack || error.message || error);
+        }
+        this.handleChange(change);
+      });
+    // }
   }
 
   async getLastSequence(): Promise<number | 'now'> {
@@ -75,8 +82,9 @@ export default class RegistryFollowerService extends Service {
   }
 
   isAddon(pkg: PackageMetadata) {
-    return true;
-    // return pkg.keywords && pkg.keywords.includes('denali-addon');
+    let version = Object.keys(pkg.versions).pop();
+    let versionPkg = pkg.versions[version];
+    return versionPkg.keywords && versionPkg.keywords.includes('denali-addon');
   }
 
   async updateAddon(pkg: PackageMetadata) {
