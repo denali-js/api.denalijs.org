@@ -15,7 +15,7 @@
     "@types/tmp": "^0.0.33",
     "bluebird": "^3.5.1",
     "denali": "0.0.x",
-    "denali-cli": "0.0.x",
+    "denali-cli": "0.0.25",
     "denali-objection": "^0.0.4",
     "denali-typescript": "^0.0.10",
     "follow": "^1.0.0",
