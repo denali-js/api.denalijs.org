@@ -42,6 +42,12 @@ export default function environmentConfig(environment: string) {
   }
 
   if (environment === 'production') {
+    config.database = {
+      client: 'pg',
+      useNullAsDefault: true,
+      connection: process.env.DATABASE_URL
+    };
+    config.migrations.db = config.database;
     // production-specific config
 
     // == SSL
