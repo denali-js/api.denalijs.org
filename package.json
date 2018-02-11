@@ -17,7 +17,7 @@
     "denali": "0.0.x",
     "denali-cli": "0.0.x",
     "denali-objection": "^0.0.4",
-    "denali-typescript": "^0.0.9",
+    "denali-typescript": "^0.0.10",
     "follow": "^1.0.0",
     "lodash": "^4.17.4",
     "node-fetch": "^2.0.0",
