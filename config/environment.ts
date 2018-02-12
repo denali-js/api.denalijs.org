@@ -13,7 +13,8 @@ export default function environmentConfig(environment: string) {
     },
     database: {
 
-    }
+    },
+    githubToken: process.env.GITHUB_TOKEN
   };
 
   if (environment === 'development') {

@@ -1,17 +1,18 @@
 import * as path from 'path';
 import { createReadStream as readStream, existsSync as exists } from 'fs';
 import { Service, Logger, lookup, ConfigService } from 'denali';
-import { difference } from 'lodash';
+import { omit } from 'lodash';
 import * as follow from 'follow';
 import * as npmKeyword from 'npm-keyword';
 import * as fetchPackage from 'package-json';
 import fetch from 'node-fetch';
 import { extract } from 'tar';
 import { dirSync as tmp } from 'tmp';
-import { PackageMetadata } from '../types';
-import CompiledVersion from '../models/compiled-version';
+import { PackageMetadata, VersionMetadata, Dict } from '../types';
 import RegistryChange from '../models/registry-change';
+import Addon from '../models/addon';
 import FilesService from '../services/files';
+import Version from '../models/version';
 
 
 interface Change {
@@ -36,34 +37,33 @@ export default class RegistryFollowerService extends Service {
     this.start();
   }
 
-  async start() {
+  private async start() {
     this.logger.info('Starting registry follower');
     let lastSequence = await this.getLastSequence();
     this.logger.info(`Last sequence: ${ lastSequence }`);
     this.startFollower(lastSequence);
   }
 
-  startFollower(lastSequence: string | number) {
-    // if (this.config.environment !== 'test') {
-      follow({ db: this.registryURL, since: lastSequence }, (error: Error, change: Change) => {
-        if (error) {
-          return this.logger.error(error.stack || error.message || error);
-        }
-        this.handleChange(change);
-      });
-    // }
+  private startFollower(lastSequence: string | number) {
+    follow({ db: this.registryURL, since: lastSequence }, (error: Error, change: Change) => {
+      if (error) {
+        return this.logger.error(error.stack || error.message || error);
+      }
+      this.handleChange(change);
+    });
   }
 
-  async getLastSequence(): Promise<number | 'now'> {
+  private async getLastSequence(): Promise<number | 'now'> {
     let lastSequence = await RegistryChange.getLastSequence();
     if (!lastSequence) {
       this.firstRun();
       return 'now';
     }
+    this.logger.info(`Resuming registry stream from seq ${ lastSequence }`);
     return lastSequence;
   }
 
-  async firstRun() {
+  private async firstRun() {
     this.logger.info('This is the first run, so catching up on already published versions');
     let packageNames: string[] = await npmKeyword.names(this.addonKeyword, { size: 250 });
     for (let name of packageNames) {
@@ -72,7 +72,7 @@ export default class RegistryFollowerService extends Service {
     }
   }
 
-  async handleChange(change: Change) {
+  private async handleChange(change: Change) {
     this.logger.info(`Change reported by registry: ${ change.id } published a version`);
     let pkg = await fetchPackage(change.id, { fullMetadata: true, allVersions: true });
     if (this.isAddon(pkg)) {
@@ -81,55 +81,68 @@ export default class RegistryFollowerService extends Service {
     RegistryChange.updateLastSequence(change.seq);
   }
 
-  isAddon(pkg: PackageMetadata) {
+  private isAddon(pkg: PackageMetadata) {
     let version = Object.keys(pkg.versions).pop();
     let versionPkg = pkg.versions[version];
     return versionPkg.keywords && versionPkg.keywords.includes('denali-addon');
   }
 
-  async updateAddon(pkg: PackageMetadata) {
-    this.logger.info(`Updating ${pkg.name} addon versions`);
-    let versions = await this.findNewVersions(pkg);
-    for (let v of versions) {
-      await this.uploadVersion(pkg, v);
+  private async updateAddon(pkg: PackageMetadata) {
+    this.logger.info(`Updating versions for addon: "${pkg.name}"`);
+    let addon = await this.findOrCreateAddon(pkg);
+    let newVersionMetadatas = await this.filterOutExistingVersions(addon, pkg.versions);
+    for (let versionName in newVersionMetadatas) {
+      let versionMetadata = newVersionMetadatas[versionName];
+      this.logger.info(`Found a new published version for "${ addon.name }": ${ versionMetadata.version }`);
+      let newVersion = await Version.createFromVersionMetadata(addon, versionMetadata);
+      await this.uploadVersion(addon, newVersion);
     }
   }
 
-  async findNewVersions(pkg: PackageMetadata) {
-    let previousCompilations = await CompiledVersion.query({ name: pkg.name });
-    let alreadyCompiledVersions = previousCompilations.map((c) => c.version);
-    let versionsToCompile = difference(Object.keys(pkg.versions), alreadyCompiledVersions);
-    return versionsToCompile;
+  private async findOrCreateAddon(pkg: PackageMetadata) {
+    let addonName = pkg.name;
+    let addon = <Addon>await Addon.find(addonName);
+    if (addon === null) {
+      this.logger.info(`Found a new addon: "${ pkg.name }`);
+      addon = await Addon.createFromPackageMetadata(pkg);
+    }
+    return addon;
   }
 
-  async uploadVersion(pkg: PackageMetadata, versionSpecifier: string) {
-    this.logger.info(`Building ${ pkg.name }@${ versionSpecifier }`);
-    let packageDir = await this.downloadTarball(pkg, versionSpecifier);
-    if (this.versionHasDocs(packageDir)) {
-      await this.saveDocs(pkg, versionSpecifier, packageDir);
+  private async filterOutExistingVersions(addon: Addon, versionMetadatas: Dict<VersionMetadata>) {
+    let existingVersionRecords = await addon.getVersions({ is_branch: false });
+    let existingVersions = existingVersionRecords.map((version) => version.version);
+    return omit(versionMetadatas, existingVersions);
+  }
+
+  private async uploadVersion(addon: Addon, version: Version) {
+    let dir = await this.downloadTarball(addon, version);
+    if (this.hasDocs(dir)) {
+      this.logger.info(`${ addon.name }@${ version.version } has docs, uploading`);
+      await this.saveDocs(addon, version, dir);
+    } else {
+      this.logger.info(`${ addon.name }@${ version.version } has no docs, skipping`);
     }
   }
 
-  private versionHasDocs(pkgDir: string) {
-    let docsDataPath = path.join(pkgDir, 'dist', 'docs.json');
+  private hasDocs(extractedTarballDir: string) {
+    let docsDataPath = path.join(extractedTarballDir, 'dist', 'docs.json');
     exists(docsDataPath);
   }
 
-  async downloadTarball(pkg: PackageMetadata, versionSpecifier: string) {
-    this.logger.info(`Downloading tarball for ${ pkg.name }@${ versionSpecifier }`);
-    let tmpdir = tmp({ unsafeCleanup: true }).name;
+  private async downloadTarball(addon: Addon, version: Version) {
+    this.logger.info(`Downloading tarball for ${ addon.name }@${ version.version }`);
+    let tmpdir = tmp({ dir: path.join(process.cwd(), '.data', 'tmp'), unsafeCleanup: true }).name;
     let extractStream = extract({ cwd: tmpdir });
-    let version = pkg.versions[versionSpecifier];
-    let tarballURL = version.dist.tarball;
-    let tarballRequest = await fetch(tarballURL);
+    let tarballRequest = await fetch(version.tarballUrl);
     tarballRequest.body.pipe(extractStream);
     await new Promise((resolve) => tarballRequest.body.on('end', resolve));
     return tmpdir;
   }
 
-  async saveDocs(pkg: PackageMetadata, version: string, dir: string): Promise<void> {
-    this.logger.info(`uploading docs for ${ pkg.name }@${ version }`);
-    await this.files.save('denali-docs', `${ pkg }/${ version }/docs.json`, readStream(path.join(dir, 'dist', 'docs.json')));
+  private async saveDocs(addon: Addon, version: Version, dir: string): Promise<void> {
+    this.logger.info(`Uploading docs for ${ addon.name }@${ version.version }`);
+    await this.files.save('denali-docs', `${ addon.name }/release-${ version.version }/docs.json`, readStream(path.join(dir, 'dist', 'docs.json')));
   }
 
 }

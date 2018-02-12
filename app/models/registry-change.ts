@@ -28,4 +28,6 @@ export default class RegistryChange extends ApplicationModel {
     return null;
   }
 
+  lastHandledSequence: number;
+
 }

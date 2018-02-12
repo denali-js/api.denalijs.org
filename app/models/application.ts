@@ -11,6 +11,9 @@ export default class ApplicationModel extends Model {
     };
   }
 
+  createdAt: Date;
+  updatedAt: Date;
+
   save() {
     this.createdAt = this.createdAt || new Date();
     this.updatedAt = new Date();
