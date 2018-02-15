@@ -16,6 +16,7 @@
     "@types/semver": "^5.5.0",
     "@types/tar": "^4.0.0",
     "@types/tmp": "^0.0.33",
+    "aws-sdk": "^2.196.0",
     "bluebird": "^3.5.1",
     "denali": "0.0.46",
     "denali-cli": "0.0.27",

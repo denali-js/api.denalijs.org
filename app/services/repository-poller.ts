@@ -116,7 +116,7 @@ export default class RepoPollerService extends Service {
   }
 
   private async downloadBranch(repoSlug: string, branchName: string) {
-    let tmpdir = tmp({ dir: path.join(process.cwd(), '.data', 'tmp'), unsafeCleanup: true }).name;
+    let tmpdir = tmp({ unsafeCleanup: true }).name;
     this.logger.info(`Downloading "${ branchName }" branch from ${ repoSlug } into ${ tmpdir }`);
     let extractStream = extract({ cwd: tmpdir });
     let tarballURL = `https://github.com/${ repoSlug }/archive/${ branchName }.tar.gz`;
