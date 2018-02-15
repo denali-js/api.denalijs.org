@@ -127,7 +127,7 @@ export default class RegistryFollowerService extends Service {
 
   private async downloadTarball(addon: Addon, version: Version) {
     this.logger.info(`Downloading tarball for ${ addon.name }@${ version.version }`);
-    let tmpdir = tmp({ dir: path.join(process.cwd(), '.data', 'tmp'), unsafeCleanup: true }).name;
+    let tmpdir = tmp({ unsafeCleanup: true }).name;
     let extractStream = extract({ cwd: tmpdir });
     let tarballRequest = await fetch(version.tarballUrl);
     tarballRequest.body.pipe(extractStream);
