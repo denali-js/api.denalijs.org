@@ -1,14 +1,14 @@
 import { attr, hasOne } from 'denali';
 import ApplicationModel from './application';
 import Addon from './addon';
-import { Branch } from '../services/repository-poller';
-import { VersionMetadata } from 'app/types';
+import { VersionMetadata, BranchConfig, GithubBranchData } from '../types';
 
 export default class Version extends ApplicationModel {
 
   static get schema() {
     return Object.assign(super.schema, {
       version: attr('string'),
+      displayName: attr('string'),
       compiledAt: attr('date'),
       docsUrl: attr('string'),
       addon: hasOne('addon'),
@@ -22,9 +22,10 @@ export default class Version extends ApplicationModel {
     });
   }
 
-  static async createBranchVersion(addon: Addon, branch: Branch): Promise<Version> {
+  static async createBranchVersion(addon: Addon, config: BranchConfig | undefined, branch: GithubBranchData): Promise<Version> {
     let version = await this.create({
       version: branch.name,
+      displayName: config && config.branchName || branch.name,
       isBranch: true,
       branchName: branch.name,
       lastSeenCommit: branch.commit.sha
@@ -43,6 +44,7 @@ export default class Version extends ApplicationModel {
   }
 
   version: string;
+  displayName: string;
   compiledAt: Date;
   docsUrl: string;
   getAddon: () => Addon;

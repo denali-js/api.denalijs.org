@@ -1,8 +1,10 @@
 import { lookup } from 'denali';
+import RegistryFollowerService from '../../app/services/registry-follower';
 
 export default {
-  name: 'follow-npm',
+  name: 'start-registry-follower',
   async initialize() {
-    lookup('service:registry-follower');
+    let registryFollower = lookup<RegistryFollowerService>('service:registry-follower');
+    registryFollower.start();
   }
 };

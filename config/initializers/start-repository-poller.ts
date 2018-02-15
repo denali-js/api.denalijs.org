@@ -1,8 +1,10 @@
 import { lookup } from 'denali';
+import RepositoryPollerService from '../../app/services/repository-poller';
 
 export default {
-  name: 'follow-npm',
+  name: 'start-repository-poller',
   async initialize() {
-    lookup('service:repository-poller');
+    let repositoryPoller = lookup<RepositoryPollerService>('service:repository-poller');
+    repositoryPoller.start();
   }
 };

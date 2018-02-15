@@ -14,7 +14,8 @@
       "sourceRoot": ".",
       "noUnusedLocals": true,
       "baseUrl": ".",
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "strictNullChecks": true
   },
   "include": [
     "lib/**/*",

@@ -8,23 +8,10 @@ import { differenceWith, flip, intersectionWith } from 'lodash';
 import { dirSync as tmp } from 'tmp';
 import { extract } from 'tar';
 import { Extracter, ExtractedDocs } from '@denali-js/documenter';
-import Addon from '../models/addon';
+import Addon, { DEFAULT_DOCS_CONFIG } from '../models/addon';
 import Version from '../models/version';
 import FilesService from '../services/files';
-
-export interface Branch {
-  name: string;
-  commit: {
-    sha: string;
-    url: string;
-  };
-}
-
-interface DocsConfig {
-  pagesDir: string;
-  sourceDirs: string[];
-  granularity: 'major' | 'minor' | 'patch';
-}
+import { DocsConfig, GithubBranchData, BranchConfig } from '../types';
 
 export default class RepoPollerService extends Service {
 
@@ -32,12 +19,7 @@ export default class RepoPollerService extends Service {
   config = lookup<ConfigService>('service:config');
   files = lookup<FilesService>('service:files');
 
-  constructor() {
-    super();
-    this.start();
-  }
-
-  private start() {
+  start() {
     this.checkNextAddon();
   }
 
@@ -47,30 +29,35 @@ export default class RepoPollerService extends Service {
     if (!addon) {
       // If we boot up faster than the registry-follower on a fresh DB, there
       // won't be any addons in the DB yet. So wait a sec.
-      return setTimeout(this.checkNextAddon.bind(this), 1000);
+      this.logger.info('No addons found - must be the first run. Delaying poller ...');
+      return setTimeout(this.checkNextAddon.bind(this), 2000);
     }
     this.logger.info(`"${ addon.name }" is the most stale addon, checking for any Github updates to release branches`);
 
+    this.logger.info(`Updating ${addon.name}'s docs config from it's master branch`);
+    let config = await addon.fetchAndUpdateDocsConfig();
+
     // Get the list of branches currently in the Github repo
-    let branches = await this.getBranches(addon);
+    let branches = await this.getBranches(addon, config);
     // Get the list of Versions that track a branch (not ones created by a published version)
     let branchVersions = await this.getBranchVersions(addon);
 
-    let comparator = (branch: Branch, version: Version) => version.branchName === branch.name;
+    let comparator = (branch: GithubBranchData, version: Version) => version.branchName === branch.name;
 
-    let branchVersionsToDelete = differenceWith<Version, Branch>(branchVersions, branches, <any>flip(comparator));
+    let branchVersionsToDelete = differenceWith<Version, GithubBranchData>(branchVersions, branches, <any>flip(comparator));
     for (let version of branchVersionsToDelete) {
       await this.deleteBranchVersion(addon, version);
     }
 
     let branchVersionsToCreate = differenceWith(branches, branchVersions, comparator);
     for (let branch of branchVersionsToCreate) {
-      await this.createBranchVersion(addon, branch);
+      let branchConfig = config.branches.find((c) => c.branchName === branch.name);
+      await this.createBranchVersion(addon, branchConfig, branch);
     }
 
     let branchVersionsToUpdate = intersectionWith(branches, branchVersions, comparator);
     for (let branch of branchVersionsToUpdate) {
-      let branchVersion = branchVersions.find((branchVersion) => comparator(branch, branchVersion));
+      let branchVersion = <Version>branchVersions.find((branchVersion) => comparator(branch, branchVersion));
       await this.updateBranchVersion(addon, branchVersion, branch);
     }
 
@@ -83,10 +70,12 @@ export default class RepoPollerService extends Service {
     );
   }
 
-  private async getBranches(addon: Addon): Promise<Branch[]> {
+  private async getBranches(addon: Addon, config: DocsConfig): Promise<GithubBranchData[]> {
     let req = await fetch(`https://api.github.com/repos/${ addon.repoSlug }/branches`, { headers: this.githubHeaders() });
-    let allBranches = <Branch[]>await req.json();
-    let versionBranches = allBranches.filter((branch) => semver.valid(branch.name) || branch.name === 'master');
+    let allBranches = <GithubBranchData[]>await req.json();
+    let versionBranches = allBranches.filter((branch) => {
+      return semver.valid(branch.name) || config.branches.find((c) => c.branchName === branch.name);
+    });
     this.logger.info(`${ addon.name } has ${ versionBranches.length } version branches`);
     return versionBranches;
   }
@@ -100,13 +89,13 @@ export default class RepoPollerService extends Service {
     await branchVersion.delete();
   }
 
-  private async createBranchVersion(addon: Addon, branch: Branch): Promise<void> {
+  private async createBranchVersion(addon: Addon, config: BranchConfig | undefined, branch: GithubBranchData): Promise<void> {
     this.logger.info(`${ addon.name } has created version branch ${ branch.name } on Github since our last check; creating a Version to track it`);
-    let branchVersion = await Version.createBranchVersion(addon, branch);
+    let branchVersion = await Version.createBranchVersion(addon, config, branch);
     await this.updateDocsFromBranch(addon, branchVersion, branch);
   }
 
-  private async updateBranchVersion(addon: Addon, branchVersion: Version, branch: Branch): Promise<void> {
+  private async updateBranchVersion(addon: Addon, branchVersion: Version, branch: GithubBranchData): Promise<void> {
     if (branchVersion.lastSeenCommit !== branch.commit.sha) {
       this.logger.info(`${ addon.name } has updated branch ${ branch.name } on Github since our last check`);
       await this.updateDocsFromBranch(addon, branchVersion, branch);
@@ -115,16 +104,10 @@ export default class RepoPollerService extends Service {
     }
   }
 
-  private async updateDocsFromBranch(addon: Addon, branchVersion: Version, branch: Branch) {
+  private async updateDocsFromBranch(addon: Addon, branchVersion: Version, branch: GithubBranchData) {
     this.logger.info(`Compiling docs for ${ addon.name }'s ${ branchVersion.version } branch`);
     let dir = await this.downloadBranch(addon.repoSlug, branchVersion.branchName);
-    let config = this.loadDocsConfig(dir);
-    if (branchVersion.branchName === 'master') {
-      this.logger.info(`Updating ${ addon.name }'s docs config from it's master branch`);
-      addon.docsVersionGranularity = config.granularity;
-      await addon.save();
-    }
-    let docs = await this.buildDocs(addon, branchVersion.branchName, dir, config);
+    let docs = await this.buildDocs(addon, branchVersion.branchName, dir);
     await this.saveDocs(addon, branchVersion, docs);
 
     branchVersion.lastSeenCommit = branch.commit.sha;
@@ -133,18 +116,19 @@ export default class RepoPollerService extends Service {
   }
 
   private async downloadBranch(repoSlug: string, branchName: string) {
-    let tmpdir = tmp({ unsafeCleanup: true }).name;
+    let tmpdir = tmp({ dir: path.join(process.cwd(), '.data', 'tmp'), unsafeCleanup: true }).name;
     this.logger.info(`Downloading "${ branchName }" branch from ${ repoSlug } into ${ tmpdir }`);
     let extractStream = extract({ cwd: tmpdir });
     let tarballURL = `https://github.com/${ repoSlug }/archive/${ branchName }.tar.gz`;
     let tarballRequest = await fetch(tarballURL);
     tarballRequest.body.pipe(extractStream);
     await new Promise((resolve) => tarballRequest.body.on('end', resolve));
-    return tmpdir;
+    return path.join(tmpdir, `${ repoSlug.split('/')[1] }-${ branchName }`);
   }
 
-  private async buildDocs(addon: Addon, version: string, dir: string, config: DocsConfig) {
+  private async buildDocs(addon: Addon, version: string, dir: string) {
     this.logger.info(`Extracting documentation for ${ addon.name }@${ version } from ${ dir }`);
+    let config = this.loadDocsConfig(dir);
     let extracter = new Extracter({
       dir,
       pagesDir: config.pagesDir,
@@ -156,16 +140,13 @@ export default class RepoPollerService extends Service {
   }
 
   private loadDocsConfig(dir: string): DocsConfig {
-    let config: DocsConfig = {
-      pagesDir: 'docs',
-      sourceDirs: [ 'app', 'lib' ],
-      granularity: 'minor'
-    };
+    let config: DocsConfig;
     try {
       this.logger.info(`Trying to load docs config from ${ dir }`);
-      config = Object.assign(config, require(path.join(dir, 'config', 'docs.json')));
+      config = Object.assign({}, DEFAULT_DOCS_CONFIG, require(path.join(dir, 'config', 'docs.json')));
     } catch (e) {
       this.logger.info(`No docs config found in ${ dir }, falling back to defaults`);
+      config = DEFAULT_DOCS_CONFIG;
     }
     return config;
   }

@@ -1,7 +1,18 @@
 import { attr, hasMany } from 'denali';
 import ApplicationModel from './application';
-import { PackageMetadata } from '../types';
+import { DocsConfig, PackageMetadata } from '../types';
 import Version from './version';
+
+export const DEFAULT_DOCS_CONFIG: DocsConfig = {
+  pagesDir: 'docs',
+  sourceDirs: [ 'app', 'lib' ],
+  granularity: 'minor',
+  versionStrategy: 'branches-over-tags',
+  semverBranches: true,
+  branches: [
+    { branchName: 'master', displayName: 'master' }
+  ]
+};
 
 export default class Addon extends ApplicationModel {
 
@@ -12,8 +23,9 @@ export default class Addon extends ApplicationModel {
       name: attr('string'),
       description: attr('string'),
       repoSlug: attr('string'),
-      // 'major', 'minor', 'patch'
       docsVersionGranularity: attr('string'),
+      docsVersionStrategy: attr('string'),
+      docsSemverBranches: attr('boolean'),
       versions: hasMany('version')
     });
   }
@@ -22,7 +34,7 @@ export default class Addon extends ApplicationModel {
     let latestVersionName = pkg['dist-tags'].latest;
     let latestVersion = pkg.versions[latestVersionName];
     let repository = latestVersion.repository;
-    let repoSlug: string;
+    let repoSlug: string | null = null;
     if (typeof repository === 'string') {
       if (repository.startsWith('github:')) {
         repoSlug = repository.slice('github:'.length);
@@ -30,7 +42,8 @@ export default class Addon extends ApplicationModel {
         repoSlug = repository;
       }
     } else if (repository && (repository.type === 'git' || repository.type == null)) {
-      repoSlug = repository.url.match(/github.com\/([^\/]+\/[^\/]+?)(?:\.git)?$/)[1];
+      let match = repository.url.match(/github.com\/([^\/]+\/[^\/]+?)(?:\.git)?$/);
+      repoSlug = match && match[1];
     }
     return this.create({
       name: pkg.name,
@@ -45,8 +58,26 @@ export default class Addon extends ApplicationModel {
   /**
    * How granular should the docs UI show the version list?
    */
-  docsVersionGranularity: 'major' | 'minor' | 'patch';
+  docsGranularity: DocsConfig['granularity'];
+  docsVersionStrategy: DocsConfig['versionStrategy'];
+  docsSemverBranches: boolean;
   getVersions: (query: any) => Version[];
   addVersion: (version: Version) => Promise<void>;
+
+  async fetchAndUpdateDocsConfig(): Promise<DocsConfig> {
+    let config: DocsConfig;
+    try {
+      let req = await fetch(`https://raw.githubusercontent.com/${ this.repoSlug }/master/config/docs.json`);
+      let rawConfig: Partial<DocsConfig> = await req.json();
+      config = Object.assign({}, DEFAULT_DOCS_CONFIG, rawConfig);
+    } catch (e) {
+      config = Object.assign({}, DEFAULT_DOCS_CONFIG);
+    }
+    this.docsGranularity = config.granularity;
+    this.docsVersionStrategy = config.versionStrategy;
+    this.docsSemverBranches = config.semverBranches;
+    await this.save();
+    return config;
+  }
 
 }

@@ -32,12 +32,7 @@ export default class RegistryFollowerService extends Service {
   files = lookup<FilesService>('service:files');
   config = lookup<ConfigService>('service:config');
 
-  constructor() {
-    super();
-    this.start();
-  }
-
-  private async start() {
+  async start() {
     this.logger.info('Starting registry follower');
     let lastSequence = await this.getLastSequence();
     this.logger.info(`Last sequence: ${ lastSequence }`);
@@ -82,7 +77,7 @@ export default class RegistryFollowerService extends Service {
   }
 
   private isAddon(pkg: PackageMetadata) {
-    let version = Object.keys(pkg.versions).pop();
+    let version = <string>Object.keys(pkg.versions).pop();
     let versionPkg = pkg.versions[version];
     return versionPkg.keywords && versionPkg.keywords.includes('denali-addon');
   }

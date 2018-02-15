@@ -64,7 +64,13 @@ the default values:
   // The directories containing source code that should be scanned to build the API docs
   "sourceDirs": [ "app", "lib" ],
   // When displaying docs to users, how granular should the version dropdown get? Allowed values: "major" (i.e. 1.x, 2.x), "minor" (i.e. 1.1, 2.3), and "patch" (i.e. 1.3.1, 2.4.8)
-  "granularity": "minor"
+  "granularity": "minor",
+  "branches": [
+    {
+      "branchName": "master",
+      "displayName": "master"
+    }
+  ]
 }
 ```
 
