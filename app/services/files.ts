@@ -39,7 +39,7 @@ export default class FilesService extends Service {
   }
 
   private get mockServerPort() {
-    return this.config.get('server', 'port') + 1;
+    return <number>this.config.getWithDefault('server', 'port', 3000) + 1;
   }
 
   private get mockServerHost() {
