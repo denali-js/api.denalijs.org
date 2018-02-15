@@ -63,9 +63,9 @@
     walk-sync "^0.3.2"
     yuidocjs "^0.10.2"
 
-"@denali-js/documenter@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@denali-js/documenter/-/documenter-1.0.2.tgz#0a55d1ade28fdd6ec116cc2fa77a62580223e90b"
+"@denali-js/documenter@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@denali-js/documenter/-/documenter-1.0.3.tgz#cbb174ec8614a0f41f95345013ca3b6600acd392"
   dependencies:
     "@types/debug" "^0.0.30"
     "@types/glob" "^5.0.35"
@@ -1191,7 +1191,7 @@ broccoli-file-creator@^1.1.1:
     rsvp "~3.0.6"
     symlink-or-copy "^1.0.1"
 
-broccoli-funnel@^1.0.1, broccoli-funnel@^1.2.0:
+broccoli-funnel@^1.0.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/broccoli-funnel/-/broccoli-funnel-1.2.0.tgz#cddc3afc5ff1685a8023488fff74ce6fb5a51296"
   dependencies:
@@ -1318,18 +1318,18 @@ broccoli-stew@^1.3.3, broccoli-stew@^1.5.0:
     symlink-or-copy "^1.1.8"
     walk-sync "^0.3.0"
 
-broccoli-typescript-compiler@^2.1.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/broccoli-typescript-compiler/-/broccoli-typescript-compiler-2.1.1.tgz#3d40d277c4804305cb8d4cd779137e44a4c16419"
+broccoli-typescript-compiler@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/broccoli-typescript-compiler/-/broccoli-typescript-compiler-2.2.0.tgz#7842f6a20ac802c1d0ac7f89963a251580d0612c"
   dependencies:
     array-binsearch "^1.0.1"
-    broccoli-funnel "^1.2.0"
+    broccoli-funnel "^2.0.1"
     broccoli-merge-trees "^2.0.0"
-    broccoli-plugin "^1.2.1"
-    fs-tree-diff "^0.5.2"
+    broccoli-plugin "^1.3.0"
+    fs-tree-diff "^0.5.7"
     heimdalljs "0.3.3"
     md5-hex "^2.0.0"
-    typescript "~2.6.1"
+    typescript "~2.7.1"
     walk-sync "^0.3.2"
 
 broccoli-writer@~0.1.1:
@@ -1919,7 +1919,7 @@ delegates@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
 
-denali-cli@0.0.24, denali-cli@^0.0.24:
+denali-cli@0.0.24:
   version "0.0.24"
   resolved "https://registry.yarnpkg.com/denali-cli/-/denali-cli-0.0.24.tgz#e7620bfde871b7d19896fa015dd49b97f50b058f"
   dependencies:
@@ -1977,11 +1977,11 @@ denali-cli@0.0.24, denali-cli@^0.0.24:
     walk-sync "^0.3.2"
     yargs "^11.0.0"
 
-denali-cli@0.0.25:
-  version "0.0.25"
-  resolved "https://registry.yarnpkg.com/denali-cli/-/denali-cli-0.0.25.tgz#3e5ecbc432eb87ed9890689c59baf17537e65a67"
+denali-cli@0.0.27, denali-cli@^0.0.27:
+  version "0.0.27"
+  resolved "https://registry.yarnpkg.com/denali-cli/-/denali-cli-0.0.27.tgz#33e790f5d806bbd3c72d6f61a480fac3868c410c"
   dependencies:
-    "@denali-js/documenter" "^1.0.2"
+    "@denali-js/documenter" "^1.0.3"
     "@types/bluebird" "^3.5.20"
     "@types/debug" "^0.0.30"
     "@types/dotenv" "^4.0.2"
@@ -2035,28 +2035,28 @@ denali-cli@0.0.25:
     walk-sync "^0.3.2"
     yargs "^11.0.0"
 
-denali-objection@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/denali-objection/-/denali-objection-0.0.4.tgz#a759673dcdb55b288f14083405ebae2d1a69496c"
+denali-objection@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/denali-objection/-/denali-objection-0.0.5.tgz#bc71fff88121cef57eef305a26fa1c60057c4e6c"
   dependencies:
     "@types/knex" "^0.0.57"
     bluebird "^3.4.6"
-    denali "^0.0.44"
-    denali-cli "^0.0.24"
-    denali-typescript "^0.0.10"
+    denali "^0.0.46"
+    denali-cli "^0.0.27"
+    denali-typescript "^0.0.11"
     knex "^0.13.0"
     lodash "^4.16.4"
     objection "^0.8.7"
     typescript "^2.4.2"
 
-denali-typescript@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/denali-typescript/-/denali-typescript-0.0.10.tgz#48dc94d2461d7ce2532cc5a46ff9686f444dd6e3"
+denali-typescript@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/denali-typescript/-/denali-typescript-0.0.11.tgz#2dcaeb3977258cf8bd65bc3ef7615cb52375a08e"
   dependencies:
     "@types/debug" "^0.0.30"
     "@types/glob" "^5.0.32"
     bluebird "^3.4.6"
-    broccoli-typescript-compiler "^2.1.0"
+    broccoli-typescript-compiler "2.2.0"
     chalk "^2.1.0"
     debug "^3.0.1"
     denali "0.0.44"
@@ -2066,7 +2066,7 @@ denali-typescript@^0.0.10:
     resolve "^1.4.0"
     returnof "^1.1.1"
 
-denali@0.0.44, denali@0.0.x, denali@^0.0.44:
+denali@0.0.44:
   version "0.0.44"
   resolved "https://registry.yarnpkg.com/denali/-/denali-0.0.44.tgz#94cc887c6f0dc91d6b3b25e42767a88936cea449"
   dependencies:
@@ -2113,6 +2113,81 @@ denali@0.0.44, denali@0.0.x, denali@^0.0.44:
     debug "^3.1.0"
     dedent-js "^1.0.1"
     denali-cli "0.0.24"
+    findup-sync "^2.0.0"
+    fs-extra "^5.0.0"
+    helmet "^3.8.2"
+    http-errors "^1.6.2"
+    inflection "^1.12.0"
+    jsonapi-typescript "^0.0.8"
+    knex "^0.14.2"
+    lodash "^4.17.5"
+    mkdirp "^0.5.1"
+    moment "^2.18.1"
+    morgan "^1.9.0"
+    parseurl "^1.3.2"
+    protochain "^1.0.5"
+    proxy-addr "^2.0.2"
+    range-parser "^1.2.0"
+    read-pkg "^3.0.0"
+    response-time "^2.3.1"
+    route-parser "0.0.5"
+    tmp "^0.0.33"
+    tree-crawl "^1.0.2"
+    try-require "^1.2.1"
+    tslib "^1.7.1"
+    type-is "^1.6.15"
+    uuid "^3.1.0"
+    ware "^1.3.0"
+    wordwrap "^1.0.0"
+    yargs "^11.0.0"
+
+denali@0.0.46, denali@^0.0.46:
+  version "0.0.46"
+  resolved "https://registry.yarnpkg.com/denali/-/denali-0.0.46.tgz#c220e849631627c82b4d3924770c9ef4c7e60738"
+  dependencies:
+    "@denali-js/loader" "0.0.3"
+    "@types/accepts" "^1.3.3"
+    "@types/bluebird" "^3.5.8"
+    "@types/body-parser" "^1.16.5"
+    "@types/compression" "^0.0.35"
+    "@types/cookie-parser" "^1.4.1"
+    "@types/cors" "^2.8.1"
+    "@types/debug" "^0.0.30"
+    "@types/etag" "^1.8.0"
+    "@types/findup-sync" "^0.3.29"
+    "@types/fs-extra" "^5.0.0"
+    "@types/glob" "^5.0.32"
+    "@types/helmet" "^0.0.37"
+    "@types/http-errors" "^1.6.1"
+    "@types/inflection" "^1.5.28"
+    "@types/lodash" "^4.14.76"
+    "@types/mkdirp" "^0.5.1"
+    "@types/morgan" "^1.7.33"
+    "@types/node" "^9.4.0"
+    "@types/parseurl" "^1.3.1"
+    "@types/proxy-addr" "^2.0.0"
+    "@types/range-parser" "^1.2.1"
+    "@types/response-time" "^2.3.1"
+    "@types/rimraf" "^2.0.2"
+    "@types/route-parser" "^0.1.1"
+    "@types/tmp" "^0.0.33"
+    "@types/type-is" "^1.6.0"
+    "@types/uuid" "^3.4.2"
+    "@types/yargs" "^10.0.1"
+    accepts "^1.3.4"
+    ava "^0.25.0"
+    bluebird "^3.4.7"
+    body-parser "^1.18.2"
+    chalk "^2.1.0"
+    cli-table2 "^0.2.0"
+    command-exists "^1.0.2"
+    compression "^1.7.1"
+    cookie-parser "^1.4.3"
+    cors "^2.8.4"
+    dag-map "^2.0.2"
+    debug "^3.1.0"
+    dedent-js "^1.0.1"
+    denali-cli "0.0.27"
     findup-sync "^2.0.0"
     fs-extra "^5.0.0"
     helmet "^3.8.2"
@@ -2723,7 +2798,7 @@ fs-minipass@^1.2.3:
   dependencies:
     minipass "^2.2.1"
 
-fs-tree-diff@^0.5.2, fs-tree-diff@^0.5.3, fs-tree-diff@^0.5.4, fs-tree-diff@^0.5.6:
+fs-tree-diff@^0.5.2, fs-tree-diff@^0.5.3, fs-tree-diff@^0.5.4, fs-tree-diff@^0.5.6, fs-tree-diff@^0.5.7:
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/fs-tree-diff/-/fs-tree-diff-0.5.7.tgz#315e2b098d5fe7f622880ac965b1b051868ac871"
   dependencies:
@@ -6147,13 +6222,13 @@ typedoc@^0.10.0:
     typedoc-default-themes "^0.5.0"
     typescript "2.7.1"
 
-typescript@2.7.1, typescript@^2.4.2, typescript@^2.7.1:
+typescript@2.7.1, typescript@^2.4.2:
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.1.tgz#bb3682c2c791ac90e7c6210b26478a8da085c359"
 
-typescript@~2.6.1:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.6.2.tgz#3c5b6fd7f6de0914269027f03c0946758f7673a4"
+typescript@^2.7.1, typescript@~2.7.1:
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.2.tgz#2d615a1ef4aee4f574425cdff7026edf81919836"
 
 uc.micro@^1.0.0, uc.micro@^1.0.1:
   version "1.0.5"
