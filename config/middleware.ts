@@ -1,6 +1,8 @@
-export default function middleware(/* router, application */) {
+import { Router } from 'denali';
+import cors from 'cors';
 
-  // Add your own middleware that will execute before Denali:
-  // router.use(someMiddlewareFunction);
+export default function middleware(router: Router) {
+
+  router.use(cors());
 
 }
