@@ -65,9 +65,10 @@ export default class RepoPollerService extends Service {
   }
 
   private async getLeastRecentlyCheckedAddon() {
-    return await Addon.queryOne((Addon: QueryBuilder) =>
-      Addon.orderBy('compiled_at').limit(1)
-    );
+    return await Addon.queryOne((Addon: QueryBuilder) => {
+      let version = await Addon.$relatedQuery('versions').orderBy('compiled_at').limit(1);
+      return version.$relatedQuery('addon');
+    });
   }
 
   private async getBranches(addon: Addon, config: DocsConfig): Promise<GithubBranchData[]> {
