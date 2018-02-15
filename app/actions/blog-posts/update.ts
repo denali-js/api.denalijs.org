@@ -1,6 +1,6 @@
 import { Errors } from 'denali';
 import ApplicationAction from '../application';
-import BlogPost from '../../models/blog-post'
+import BlogPost from '../../models/blog-post';
 
 export default class UpdateBlogPost extends ApplicationAction {
 
