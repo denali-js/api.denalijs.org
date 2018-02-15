@@ -68,7 +68,7 @@ export default class RepoPollerService extends Service {
 
   private async getLeastRecentlyCheckedAddon() {
     return await Addon.queryOne(async (objection: QueryBuilder) => {
-      return objection.orderBy('updated_at').limit(1);
+      return objection.whereNotNull('repo_slug').orderBy('updated_at').limit(1);
     });
   }
 

@@ -1,7 +1,12 @@
 import { Stream } from 'stream';
 import { writeFileSync as writeFile } from 'fs';
 import * as path from 'path';
+import { promisify } from 'util';
 import { Service, lookup, ConfigService, Logger } from 'denali';
+import AWS from 'aws-sdk';
+
+const s3 = new AWS.S3({apiVersion: '2006-03-01', region: 'us-west-2'});
+const upload = promisify(s3.upload.bind(s3));
 
 export default class FilesService extends Service {
 
@@ -27,7 +32,9 @@ export default class FilesService extends Service {
   }
 
   private async uploadToAWS(bucket: string, filepath: string, file: string | Stream): Promise<string> {
-    throw new Error('Not implemented');
+    let params = { Bucket: bucket, Key: filepath, Body: file };
+    let result: AWS.S3.ManagedUpload.SendData = await upload(params);
+    return result.Location;
   }
 
   private async saveToLocal(bucket: string, filepath: string, file: string | Stream): Promise<string> {
