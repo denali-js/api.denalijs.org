@@ -75,7 +75,7 @@ export default class RepoPollerService extends Service {
   private async getBranches(addon: Addon, config: DocsConfig): Promise<GithubBranchData[]> {
     let req = await fetch(`https://api.github.com/repos/${ addon.repoSlug }/branches`, { headers: this.githubHeaders() });
     let allBranches = <GithubBranchData[]>await req.json();
-    assert(Array.isArray(allBranches), `Expected to get an array of branches back from Github for ${ addon.repoSlug }, got ${ inspect(allBranches) } instead`);
+    assert(Array.isArray(allBranches), `Expected to get an array of branches back from Github for ${ addon }, got ${ inspect(allBranches) } instead`);
     let versionBranches = allBranches.filter((branch) => {
       return semver.valid(branch.name) || config.branches.find((c) => c.branchName === branch.name);
     });
