@@ -77,6 +77,9 @@ export default class RegistryFollowerService extends Service {
   }
 
   private isAddon(pkg: PackageMetadata) {
+    if (!pkg.versions) {
+      return false;
+    }
     let version = <string>Object.keys(pkg.versions).pop();
     let versionPkg = pkg.versions[version];
     return versionPkg.keywords && versionPkg.keywords.includes('denali-addon');
