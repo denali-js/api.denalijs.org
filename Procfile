@@ -1,1 +1,1 @@
-web: npx denali server --production
+web: npx denali build && npx denali server --production
