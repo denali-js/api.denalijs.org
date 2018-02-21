@@ -166,7 +166,8 @@ export default class RepoPollerService extends Service {
     let limitBuffer = limit * 0.2;
     let safeRequestsRemaining = remaining - limitBuffer;
     let timeLeft = resetsAt - moment().unix();
-    let safeInterval = Math.max(2, timeLeft / safeRequestsRemaining);
+    let minimumInterval = this.config.get('environment') === 'production' ? 2 : 20;
+    let safeInterval = Math.max(minimumInterval, timeLeft / safeRequestsRemaining);
     this.logger.info(`${ timeLeft }s left in rate limit window, ${ safeRequestsRemaining } requests available; scheduling next update for ${ safeInterval.toFixed(3) }s from now`);
     setTimeout(this.checkNextAddon.bind(this), safeInterval * 1000);
   }
