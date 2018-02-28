@@ -118,6 +118,7 @@ export default class RepoPollerService extends Service {
       await this.saveDocs(addon, branchVersion, docs);
     } catch (e) {
       // nothing for now
+      // TODO: log it out or warn somehow
     }
 
     branchVersion.lastSeenCommit = branch.commit.sha;

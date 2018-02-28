@@ -5,12 +5,11 @@ import Version from '../../models/version';
 
 export default class ShowVersion extends ApplicationAction {
 
-  async respond({ params }: { params: { id: string } }) {
-    let [ addon_id, version_id ] = params.id.split(':');
-    assert(version_id, 'You must include which version to fetch, i.e. denali:0.1.0');
-    let version = await Version.queryOne({ addon_id, version: version_id });
+  async respond({ query }: { query: { addon: string, version: string} }) {
+    assert(query.version, 'You must include which version to fetch, i.e. denali:0.1.0');
+    let version = await Version.queryOne({ addon_id: query.addon, version: query.version });
     if (!version) {
-      throw new Errors.NotFound(`Version not found (addon: "${ addon_id }", version: "${ version_id }"`);
+      throw new Errors.NotFound(`Version not found (addon: "${ query.addon }", version: "${ query.version }")`);
     }
     return version;
   }
