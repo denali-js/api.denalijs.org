@@ -2,7 +2,7 @@ import { Stream } from 'stream';
 import { writeFileSync as writeFile } from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
-import { Service, lookup, ConfigService, Logger } from 'denali';
+import { Service, lookup, ConfigService, Logger } from '@denali-js/core';
 import AWS from 'aws-sdk';
 
 const s3 = new AWS.S3({apiVersion: '2006-03-01', region: 'us-west-2'});

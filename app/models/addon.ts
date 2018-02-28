@@ -1,4 +1,4 @@
-import { attr, hasMany } from 'denali';
+import { attr, hasMany } from '@denali-js/core';
 import ApplicationModel from './application';
 import { DocsConfig, PackageMetadata } from '../types';
 import Version from './version';

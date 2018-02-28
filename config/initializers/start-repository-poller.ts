@@ -1,4 +1,4 @@
-import { lookup } from 'denali';
+import { lookup } from '@denali-js/core';
 import RepositoryPollerService from '../../app/services/repository-poller';
 
 export default {

@@ -1,4 +1,4 @@
-import { attr } from 'denali';
+import { attr } from '@denali-js/core';
 import { ObjectionAdapter } from 'denali-objection';
 import ApplicationModel from './application';
 

@@ -1,3 +1,3 @@
-import { JSONAPIParser } from 'denali';
+import { JSONAPIParser } from '@denali-js/core';
 
 export default JSONAPIParser;

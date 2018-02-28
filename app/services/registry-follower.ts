@@ -1,18 +1,16 @@
 import * as path from 'path';
 import { createReadStream as readStream, existsSync as exists } from 'fs';
-import { Service, Logger, lookup, ConfigService } from 'denali';
+import { Service, Logger, lookup, ConfigService } from '@denali-js/core';
 import { omit } from 'lodash';
 import follow from 'follow';
 import npmKeyword from 'npm-keyword';
 import fetchPackage from 'package-json';
-import fetch from 'node-fetch';
-import { extract } from 'tar';
-import { dirSync as tmp } from 'tmp';
 import { PackageMetadata, VersionMetadata, Dict } from '../types';
 import RegistryChange from '../models/registry-change';
 import Addon from '../models/addon';
 import FilesService from '../services/files';
 import Version from '../models/version';
+import downloadTarball from '../utils/download-tarball';
 
 
 interface Change {
@@ -114,7 +112,8 @@ export default class RegistryFollowerService extends Service {
   }
 
   private async uploadVersion(addon: Addon, version: Version) {
-    let dir = await this.downloadTarball(addon, version);
+    this.logger.info(`Downloading tarball for ${ addon.name }@${ version.version }`);
+    let dir = await downloadTarball(version.tarballUrl);
     if (this.hasDocs(dir)) {
       this.logger.info(`${ addon.name }@${ version.version } has docs, uploading`);
       await this.saveDocs(addon, version, dir);
@@ -126,16 +125,6 @@ export default class RegistryFollowerService extends Service {
   private hasDocs(extractedTarballDir: string) {
     let docsDataPath = path.join(extractedTarballDir, 'dist', 'docs.json');
     exists(docsDataPath);
-  }
-
-  private async downloadTarball(addon: Addon, version: Version) {
-    this.logger.info(`Downloading tarball for ${ addon.name }@${ version.version }`);
-    let tmpdir = tmp({ unsafeCleanup: true }).name;
-    let extractStream = extract({ cwd: tmpdir });
-    let tarballRequest = await fetch(version.tarballUrl);
-    tarballRequest.body.pipe(extractStream);
-    await new Promise((resolve) => tarballRequest.body.on('end', resolve));
-    return tmpdir;
   }
 
   private async saveDocs(addon: Addon, version: Version, dir: string): Promise<void> {

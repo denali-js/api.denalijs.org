@@ -4,6 +4,7 @@ export async function up(knex: Knex) {
   return knex.schema.createTable('versions', (versions) => {
     versions.increments();
     versions.text('version');
+    versions.text('display_name');
     versions.dateTime('compiled_at');
     versions.text('docs_url');
     versions.text('addon_id').references('addons.name');

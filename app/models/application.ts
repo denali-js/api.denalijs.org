@@ -1,4 +1,4 @@
-import { Model, attr } from 'denali';
+import { Model, attr } from '@denali-js/core';
 
 export default class ApplicationModel extends Model {
 

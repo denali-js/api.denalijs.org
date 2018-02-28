@@ -1,19 +1,19 @@
 import * as path from 'path';
+import { readdirSync as readdir } from 'fs';
 import assert from 'assert';
 import { inspect } from 'util';
-import { Service, lookup, Logger, ConfigService } from 'denali';
+import { Service, lookup, Logger, ConfigService } from '@denali-js/core';
 import moment = require('moment');
 import { QueryBuilder } from 'knex';
 import * as semver from 'semver';
 import fetch from 'node-fetch';
 import { differenceWith, flip, intersectionWith } from 'lodash';
-import { dirSync as tmp } from 'tmp';
-import { extract } from 'tar';
 import { Extracter, ExtractedDocs } from '@denali-js/documenter';
 import Addon, { DEFAULT_DOCS_CONFIG } from '../models/addon';
 import Version from '../models/version';
 import FilesService from '../services/files';
 import { DocsConfig, GithubBranchData, BranchConfig } from '../types';
+import downloadTarball from '../utils/download-tarball';
 
 export default class RepoPollerService extends Service {
 
@@ -109,24 +109,20 @@ export default class RepoPollerService extends Service {
 
   private async updateDocsFromBranch(addon: Addon, branchVersion: Version, branch: GithubBranchData) {
     this.logger.info(`Compiling docs for ${ addon.name }'s ${ branchVersion.version } branch`);
-    let dir = await this.downloadBranch(addon.repoSlug, branchVersion.branchName);
-    let docs = await this.buildDocs(addon, branchVersion.branchName, dir);
-    await this.saveDocs(addon, branchVersion, docs);
+    let tarballURL = `https://github.com/${ addon.repoSlug }/archive/${ branchVersion.branchName }.tar.gz`;
+    let dir = await downloadTarball(tarballURL);
+    let extractedFolder = readdir(dir)[0];
+    dir = path.join(dir, extractedFolder);
+    try {
+      let docs = await this.buildDocs(addon, branchVersion.branchName, dir);
+      await this.saveDocs(addon, branchVersion, docs);
+    } catch (e) {
+      // nothing for now
+    }
 
     branchVersion.lastSeenCommit = branch.commit.sha;
     branchVersion.compiledAt = new Date();
     await branchVersion.save();
-  }
-
-  private async downloadBranch(repoSlug: string, branchName: string) {
-    let tmpdir = tmp({ unsafeCleanup: true }).name;
-    this.logger.info(`Downloading "${ branchName }" branch from ${ repoSlug } into ${ tmpdir }`);
-    let extractStream = extract({ cwd: tmpdir });
-    let tarballURL = `https://github.com/${ repoSlug }/archive/${ branchName }.tar.gz`;
-    let tarballRequest = await fetch(tarballURL);
-    tarballRequest.body.pipe(extractStream);
-    await new Promise((resolve) => tarballRequest.body.on('end', resolve));
-    return path.join(tmpdir, `${ repoSlug.split('/')[1] }-${ branchName }`);
   }
 
   private async buildDocs(addon: Addon, version: string, dir: string) {

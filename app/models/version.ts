@@ -1,4 +1,4 @@
-import { attr, hasOne } from 'denali';
+import { attr, hasOne } from '@denali-js/core';
 import ApplicationModel from './application';
 import Addon from './addon';
 import { VersionMetadata, BranchConfig, GithubBranchData } from '../types';

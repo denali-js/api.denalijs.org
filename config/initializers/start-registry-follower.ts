@@ -1,4 +1,4 @@
-import { lookup } from 'denali';
+import { lookup } from '@denali-js/core';
 import RegistryFollowerService from '../../app/services/registry-follower';
 
 export default {

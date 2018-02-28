@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { Errors } from 'denali';
+import { Errors } from '@denali-js/core';
 import ApplicationAction from '../application';
 import Version from '../../models/version';
 

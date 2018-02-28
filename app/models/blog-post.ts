@@ -1,4 +1,4 @@
-import { attr } from 'denali';
+import { attr } from '@denali-js/core';
 import ApplicationModel from './application';
 
 export default class BlogPost extends ApplicationModel {
