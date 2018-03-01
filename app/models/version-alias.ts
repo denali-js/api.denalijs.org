@@ -21,9 +21,14 @@ export default class VersionAlias extends ApplicationModel {
       logger.warn(`Unable to create a version alias from ${ aliasName } -> ${ versionName }: "${ versionName }" version does not exist`);
       return;
     }
-    let alias = await this.create({ alias: aliasName });
-    await alias.setVersion(version);
-    await alias.save();
+    let versionAlias = await this.queryOne({ alias: aliasName, version_id: version.id });
+    if (!versionAlias) {
+      versionAlias = await this.create({ alias: aliasName });
+    } else {
+      versionAlias.alias = aliasName;
+    }
+    await versionAlias.setVersion(version);
+    await versionAlias.save();
   }
 
   alias: string;
