@@ -2,7 +2,7 @@ import * as path from 'path';
 import { readdirSync as readdir } from 'fs';
 import assert from 'assert';
 import { inspect } from 'util';
-import { Service, lookup, Logger, ConfigService } from '@denali-js/core';
+import { Service, lookup, ConfigService } from '@denali-js/core';
 import moment = require('moment');
 import { QueryBuilder } from 'knex';
 import * as semver from 'semver';
@@ -14,10 +14,11 @@ import Version from '../models/version';
 import FilesService from '../services/files';
 import { DocsConfig, GithubBranchData, BranchConfig } from '../types';
 import downloadTarball from '../utils/download-tarball';
+import ApplicationLogger from '../logger';
 
 export default class RepoPollerService extends Service {
 
-  logger = lookup<Logger>('app:logger');
+  logger = lookup<ApplicationLogger>('app:logger').scope('repository-poller');
   config = lookup<ConfigService>('service:config');
   files = lookup<FilesService>('service:files');
 

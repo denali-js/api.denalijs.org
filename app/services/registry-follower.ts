@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { createReadStream as readStream, existsSync as exists } from 'fs';
-import { Service, Logger, lookup, ConfigService } from '@denali-js/core';
+import { Service, lookup, ConfigService } from '@denali-js/core';
 import { omit } from 'lodash';
 import follow from 'follow';
 import npmKeyword from 'npm-keyword';
@@ -12,6 +12,7 @@ import FilesService from '../services/files';
 import Version from '../models/version';
 import downloadTarball from '../utils/download-tarball';
 import VersionAlias from '../models/version-alias';
+import ApplicationLogger from '../logger';
 
 
 interface Change {
@@ -27,7 +28,7 @@ export default class RegistryFollowerService extends Service {
   registryURL = 'https://skimdb.npmjs.com/registry';
   addonKeyword = 'denali-addon';
 
-  logger = lookup<Logger>('app:logger');
+  logger = lookup<ApplicationLogger>('app:logger').scope('registry-follow');
   files = lookup<FilesService>('service:files');
   config = lookup<ConfigService>('service:config');
 
