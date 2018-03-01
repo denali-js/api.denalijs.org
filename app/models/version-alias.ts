@@ -28,11 +28,14 @@ export default class VersionAlias extends ApplicationModel {
       versionAlias.alias = aliasName;
     }
     await versionAlias.setVersion(version);
+    await versionAlias.setAddon(addon);
     await versionAlias.save();
   }
 
   alias: string;
   getVersion: () => Version;
-  setVersion: (version: Version) => Version;
+  setVersion: (version: Version) => void;
+  getAddon: () => Addon;
+  setAddon: (addon: Addon) => void;
 
 }
