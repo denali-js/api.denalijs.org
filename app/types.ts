@@ -72,6 +72,6 @@ export interface DocsConfig {
 }
 
 export interface BranchConfig {
-  branchName?: string;
+  branchName: string;
   displayName?: string;
 }

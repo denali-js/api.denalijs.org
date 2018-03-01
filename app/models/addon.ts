@@ -2,6 +2,7 @@ import { attr, hasMany } from '@denali-js/core';
 import ApplicationModel from './application';
 import { DocsConfig, PackageMetadata } from '../types';
 import Version from './version';
+import VersionAlias from './version-alias';
 
 export const DEFAULT_DOCS_CONFIG: DocsConfig = {
   pagesDir: 'docs',
@@ -73,9 +74,18 @@ export default class Addon extends ApplicationModel {
     } catch (e) {
       config = Object.assign({}, DEFAULT_DOCS_CONFIG);
     }
+
     this.docsGranularity = config.granularity;
     this.docsVersionStrategy = config.versionStrategy;
     this.docsSemverBranches = config.semverBranches;
+
+    config.branches.forEach(({ branchName, displayName }) => {
+      if (displayName) {
+        VersionAlias.createOrUpdate(displayName, branchName, this);
+      }
+      // TODO: create branch versions here if they don't already exist
+    });
+
     await this.save();
     return config;
   }

@@ -11,6 +11,7 @@ import Addon from '../models/addon';
 import FilesService from '../services/files';
 import Version from '../models/version';
 import downloadTarball from '../utils/download-tarball';
+import VersionAlias from '../models/version-alias';
 
 
 interface Change {
@@ -86,12 +87,25 @@ export default class RegistryFollowerService extends Service {
   private async updateAddon(pkg: PackageMetadata) {
     this.logger.info(`Updating versions for addon: "${pkg.name}"`);
     let addon = await this.findOrCreateAddon(pkg);
+    await this.updateVersions(addon, pkg);
+    await this.updateVersionAliases(addon, pkg);
+  }
+
+  private async updateVersions(addon: Addon, pkg: PackageMetadata) {
     let newVersionMetadatas = await this.filterOutExistingVersions(addon, pkg.versions);
     for (let versionName in newVersionMetadatas) {
       let versionMetadata = newVersionMetadatas[versionName];
-      this.logger.info(`Found a new published version for "${ addon.name }": ${ versionMetadata.version }`);
+      this.logger.info(`Found a new published version for "${addon.name}": ${versionMetadata.version}`);
       let newVersion = await Version.createFromVersionMetadata(addon, versionMetadata);
       await this.uploadVersion(addon, newVersion);
+    }
+  }
+
+  private async updateVersionAliases(addon: Addon, pkg: PackageMetadata) {
+    let distTags = pkg['dist-tags'];
+    for (let tag in distTags) {
+      let versionId = distTags[tag];
+      VersionAlias.createOrUpdate(tag, versionId, addon);
     }
   }
 
