@@ -5,7 +5,7 @@ export async function up(knex: Knex) {
     versionAliases.increments();
     versionAliases.text('alias');
     versionAliases.bigInteger('version_id').unsigned().index().references('versions.id');
-    versionAliases.text('addon_id').index().references('addons.id');
+    versionAliases.text('addon_id').index().references('addons.name');
     versionAliases.timestamps();
   });
 }
