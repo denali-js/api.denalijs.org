@@ -11,7 +11,8 @@ export default class VersionAlias extends ApplicationModel {
   static get schema() {
     return Object.assign(super.schema, {
       alias: attr('string'),
-      version: hasOne('version')
+      version: hasOne('version'),
+      addon: hasOne('addon')
     });
   }
 
