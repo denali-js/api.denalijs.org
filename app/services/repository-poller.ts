@@ -121,7 +121,8 @@ export default class RepoPollerService extends Service {
       // nothing for now
       // TODO: log it out or warn somehow
     }
-
+    this.logger.info(branchVersion)
+    this.logger.info(branchVersion.docsUrl)
     branchVersion.lastSeenCommit = branch.commit.sha;
     branchVersion.compiledAt = new Date();
     await branchVersion.save();
@@ -156,7 +157,6 @@ export default class RepoPollerService extends Service {
     this.logger.info(`Uploading docs for ${ addon.name } branch "${ branchVersion.branchName }"`);
     let filepath = `${ addon.name }/branch-${ branchVersion.branchName }/docs.json`;
     branchVersion.docsUrl = await this.files.save('denali-docs', filepath, JSON.stringify(docs));
-    await branchVersion.save();
   }
 
   private async scheduleNextCheck() {
