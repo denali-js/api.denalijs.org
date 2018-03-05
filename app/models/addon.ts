@@ -136,7 +136,7 @@ export default class Addon extends ApplicationModel {
 
     // (2) A semver-named branch exists which satisfies the currently published
     // 'latest' dist-tag version
-    let allVersions = await Version.query({ addon: this.id });
+    let allVersions = await Version.query({ addon_id: this.id });
     let branchMatchingLatestDistTag = allVersions.find((v) => semver.satisfies(latestDistTag, v.branchName));
     if (branchMatchingLatestDistTag) {
       await VersionAlias.createOrUpdate('latest', branchMatchingLatestDistTag.branchName, this);
