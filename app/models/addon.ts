@@ -115,6 +115,7 @@ export default class Addon extends ApplicationModel {
    *
    */
   async updateLatestAlias(config?: DocsConfig) {
+    logger.info(`Updating 'latest' alias for ${ this.name }`);
     if (!config) {
       config = await this.fetchAndUpdateDocsConfig();
     }
@@ -122,6 +123,7 @@ export default class Addon extends ApplicationModel {
     // (1) Explicit config takes precedence over everything
     let latestBranch = config.branches.find((b) => Boolean(b.latest));
     if (latestBranch) {
+      logger.info(`${ this.name } 'latest' is explicity configured to point to ${ latestBranch.branchName }`);
       await VersionAlias.createOrUpdate('latest', latestBranch.branchName, this);
       return;
     }
@@ -139,6 +141,7 @@ export default class Addon extends ApplicationModel {
     let allVersions = await Version.query({ addon_id: this.id });
     let branchMatchingLatestDistTag = allVersions.find((v) => semver.satisfies(latestDistTag, v.branchName));
     if (branchMatchingLatestDistTag) {
+      logger.info(`${ this.name } 'latest' will point to ${ branchMatchingLatestDistTag.branchName } branch on Github because that branch satisfies the current 'latest' dist-tag on npm`);
       await VersionAlias.createOrUpdate('latest', branchMatchingLatestDistTag.branchName, this);
       return;
     }
@@ -146,12 +149,14 @@ export default class Addon extends ApplicationModel {
     // (3) `branches-over-tags` with no branch to satisfy npm's 'latest', and a
     // valid github reference, falls back to master
     if (this.repoSlug && config.versionStrategy === VersionStrategies.BRANCHES_OVER_TAGS) {
+      logger.info(`${ this.name } 'latest' will point to master branch on Github because no semver branch currently satisfies the 'latest' dist-tag on npm`);
       await VersionAlias.createOrUpdate('latest', 'master', this);
       return;
     }
 
     // (4) Final fallback: use npm's latest version exactly
     if (allVersions.find((v) => v.version === latestDistTag)) {
+      logger.info(`${ this.name } 'latest' will point to ${ latestDistTag } version published on npm, because no other approach worked`);
       await VersionAlias.createOrUpdate('latest', latestDistTag, this);
       return;
     }
