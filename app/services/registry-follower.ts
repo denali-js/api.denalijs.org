@@ -90,6 +90,8 @@ export default class RegistryFollowerService extends Service {
     let addon = await this.findOrCreateAddon(pkg);
     await this.updateVersions(addon, pkg);
     await this.updateVersionAliases(addon, pkg);
+    await addon.updateLatestAlias();
+
   }
 
   private async updateVersions(addon: Addon, pkg: PackageMetadata) {

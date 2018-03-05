@@ -16,8 +16,8 @@ export default class RegistryChange extends ApplicationModel {
 
   static updateLastSequence(seq: number) {
     this.raw
-    .patch(<any>{ lastHandledSequence: seq })
-    .where('lastHandledSequence', '<', seq);
+    .patch(<any>{ last_handled_sequence: seq })
+    .where('last_handled_sequence', '<', seq);
   }
 
   static async getLastSequence(): Promise<number | null> {

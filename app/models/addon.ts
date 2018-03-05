@@ -1,19 +1,23 @@
-import { attr, hasMany } from '@denali-js/core';
+import { lookup, Logger, attr, hasMany } from '@denali-js/core';
+import fetchPackage from 'package-json';
+import semver from 'semver';
 import ApplicationModel from './application';
-import { DocsConfig, PackageMetadata } from '../types';
+import { DocsConfig, PackageMetadata, VersionStrategies, Granularities } from '../types';
 import Version from './version';
 import VersionAlias from './version-alias';
 
 export const DEFAULT_DOCS_CONFIG: DocsConfig = {
   pagesDir: 'docs',
   sourceDirs: [ 'app', 'lib' ],
-  granularity: 'minor',
-  versionStrategy: 'branches-over-tags',
+  granularity: Granularities.MINOR,
+  versionStrategy: VersionStrategies.BRANCHES_OVER_TAGS,
   semverBranches: true,
   branches: [
     { branchName: 'master', displayName: 'master' }
   ]
 };
+
+const logger = lookup<Logger>('app:logger');
 
 export default class Addon extends ApplicationModel {
 
@@ -56,15 +60,20 @@ export default class Addon extends ApplicationModel {
   name: string;
   description: string;
   repoSlug: string;
-  /**
-   * How granular should the docs UI show the version list?
-   */
+
+  // Docs config
   docsGranularity: DocsConfig['granularity'];
   docsVersionStrategy: DocsConfig['versionStrategy'];
   docsSemverBranches: boolean;
+
   getVersions: (query: any) => Version[];
   addVersion: (version: Version) => Promise<void>;
 
+  /**
+   * Fetch config/docs.json for this addon from it's master branch on Github,
+   * and update our local copies of the various config values. Returns the
+   * fetched config.
+   */
   async fetchAndUpdateDocsConfig(): Promise<DocsConfig> {
     let config: DocsConfig;
     try {
@@ -88,6 +97,66 @@ export default class Addon extends ApplicationModel {
 
     await this.save();
     return config;
+  }
+
+  /**
+   * `latest` is a special alias, which is determined by this app. Basically,
+   * to determine which version is `latest`, pick the first rule that applies:
+   *
+   * 1. If the addon's doc config explicitly marks a branch as latest, use
+   *    that.
+   * 2. If the version published on npm under the `latest` dist-tag is subsumed
+   *    by a semver-named branch, use that branch.
+   * 3. If the docs config specifies `branches-over-tags` as it's versioning
+   *    strategy, and no semver-named branch subsumes the version published under
+   *    npm's `latest` dist-tag, and we have a github repo reference for this
+   *    addon, then use master.
+   * 3. The version published on npm under the `latest` dist-tag.
+   *
+   */
+  async updateLatestAlias(config?: DocsConfig) {
+    if (!config) {
+      config = await this.fetchAndUpdateDocsConfig();
+    }
+
+    // (1) Explicit config takes precedence over everything
+    let latestBranch = config.branches.find((b) => Boolean(b.latest));
+    if (latestBranch) {
+      await VersionAlias.createOrUpdate('latest', latestBranch.branchName, this);
+      return;
+    }
+
+    // Fetch the 'latest' dist-tag from npm
+    let pkg: PackageMetadata = await fetchPackage(this.name, { fullMetadata: true, allVersions: true });
+    let latestDistTag = pkg['dist-tags'].latest;
+    if (!latestDistTag) {
+      logger.warn(`${ this.name } addon package doesn't have a 'latest' dist tag on npm, not sure how to pick a 'latest' version`);
+      return;
+    }
+
+    // (2) A semver-named branch exists which satisfies the currently published
+    // 'latest' dist-tag version
+    let allVersions = await Version.query({ addon: this.id });
+    let branchMatchingLatestDistTag = allVersions.find((v) => semver.satisfies(latestDistTag, v.branchName));
+    if (branchMatchingLatestDistTag) {
+      await VersionAlias.createOrUpdate('latest', branchMatchingLatestDistTag.branchName, this);
+      return;
+    }
+
+    // (3) `branches-over-tags` with no branch to satisfy npm's 'latest', and a
+    // valid github reference, falls back to master
+    if (this.repoSlug && config.versionStrategy === VersionStrategies.BRANCHES_OVER_TAGS) {
+      await VersionAlias.createOrUpdate('latest', 'master', this);
+      return;
+    }
+
+    // (4) Final fallback: use npm's latest version exactly
+    if (allVersions.find((v) => v.version === latestDistTag)) {
+      await VersionAlias.createOrUpdate('latest', latestDistTag, this);
+      return;
+    }
+
+    logger.error(`Trying to pick a latest version for ${ this.name }, but all strategies failed.`);
   }
 
 }

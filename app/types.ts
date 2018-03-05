@@ -44,7 +44,7 @@ export interface DocsConfig {
    * branches configured via `branches` or `semverBranches`, this will not
    * affect versions sourced from those branches.
    */
-  granularity: 'major' | 'minor' | 'patch';
+  granularity: Granularities;
   /**
    * Determines which versions are visible, and where they are sourced from.
    *
@@ -52,7 +52,7 @@ export interface DocsConfig {
    * branches-over-tags: if a branch has a semver name, hide all tags subsumed by that semver string
    * tags-only: ignore all branches, only show docs built from published npm versions
    */
-  versionStrategy: 'branches-only' | 'branches-over-tags' | 'tags-only';
+  versionStrategy: VersionStrategies;
   /**
    * An array of branches and their display names that should be used to build docs from
    */
@@ -71,7 +71,20 @@ export interface DocsConfig {
   semverBranches: boolean;
 }
 
+export enum VersionStrategies {
+  BRANCHES_ONLY = 'branches-only',
+  BRANCHES_OVER_TAGS = 'branches-over-tags',
+  TAGS_ONLY = 'tags-only'
+}
+
+export enum Granularities {
+  MAJOR = 'major',
+  MINOR = 'minor',
+  PATCH = 'patch'
+}
+
 export interface BranchConfig {
   branchName: string;
   displayName?: string;
+  latest?: true;
 }

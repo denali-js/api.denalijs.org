@@ -64,6 +64,8 @@ export default class RepoPollerService extends Service {
       await this.updateBranchVersion(addon, branchVersion, branch);
     }
 
+    await addon.updateLatestAlias(config);
+
     this.scheduleNextCheck();
   }
 
@@ -121,8 +123,8 @@ export default class RepoPollerService extends Service {
       // nothing for now
       // TODO: log it out or warn somehow
     }
-    this.logger.info(branchVersion)
-    this.logger.info(branchVersion.docsUrl)
+    this.logger.info(branchVersion);
+    this.logger.info(branchVersion.docsUrl);
     branchVersion.lastSeenCommit = branch.commit.sha;
     branchVersion.compiledAt = new Date();
     await branchVersion.save();
@@ -130,6 +132,9 @@ export default class RepoPollerService extends Service {
 
   private async buildDocs(addon: Addon, version: string, dir: string) {
     this.logger.info(`Extracting documentation for ${ addon.name }@${ version } from ${ dir }`);
+    // We load the docs config here, from the copied source, to ensure we use the right `pagesDir`, etc.
+    // If we used the docs config from master (via addon.fetchAndUpdateDocsConfig), if the addon changes
+    // it's docs directory structure, it would be incorrect for older versions
     let config = this.loadDocsConfig(dir);
     let extracter = new Extracter({
       dir,
