@@ -14,10 +14,10 @@ export default class RegistryChange extends ApplicationModel {
     });
   }
 
-  static updateLastSequence(seq: number) {
-    this.raw
-    .patch(<any>{ last_handled_sequence: seq })
-    .where('last_handled_sequence', '<', seq);
+  static async updateLastSequence(seq: number) {
+    await this.raw
+          .patch(<any>{ last_handled_sequence: seq })
+          .where('last_handled_sequence', '<', seq);
   }
 
   static async getLastSequence(): Promise<number | null> {
