@@ -18,7 +18,6 @@ export default class ShowVersion extends ApplicationAction {
       }
       version = await versionAlias.getVersion();
     }
-    console.log(version);
     return version;
   }
 
