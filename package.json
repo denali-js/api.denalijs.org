@@ -10,10 +10,10 @@
     "node": ">=7.6.0"
   },
   "dependencies": {
-    "@denali-js/cli": "0.1.2",
-    "@denali-js/core": "0.1.2",
+    "@denali-js/cli": "0.1.x",
+    "@denali-js/core": "0.1.x",
     "@denali-js/documenter": "^2.0.0",
-    "@denali-js/typescript": "^0.1.1",
+    "@denali-js/typescript": "^0.1.x",
     "@types/moment": "^2.13.0",
     "@types/node-fetch": "^1.6.7",
     "@types/semver": "^5.5.0",
