@@ -102,7 +102,7 @@
     walk-sync "^0.3.2"
     yargs "^11.0.0"
 
-"@denali-js/cli@0.1.2":
+"@denali-js/cli@0.1.2", "@denali-js/cli@0.1.x":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@denali-js/cli/-/cli-0.1.2.tgz#743b2547762cd5ed1c570e01a1b57dbeecec68bf"
   dependencies:
@@ -160,7 +160,7 @@
     walk-sync "^0.3.2"
     yargs "^11.0.0"
 
-"@denali-js/core@0.1.2":
+"@denali-js/core@0.1.x":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@denali-js/core/-/core-0.1.2.tgz#2582795ae833d90ebb0c4faa86c1f96e688d88e9"
   dependencies:
@@ -377,7 +377,7 @@
     is-builtin-module "^2.0.0"
     resolve "^1.5.0"
 
-"@denali-js/typescript@^0.1.1":
+"@denali-js/typescript@^0.1.1", "@denali-js/typescript@^0.1.x":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@denali-js/typescript/-/typescript-0.1.1.tgz#0627426b820c25e1955d058d22d711f2cf0b6b53"
   dependencies:
