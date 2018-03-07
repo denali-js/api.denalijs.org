@@ -86,7 +86,7 @@ export default class RegistryFollowerService extends Service {
   }
 
   private async updateAddon(pkg: PackageMetadata) {
-    this.logger.info(`Updating versions for addon: "${pkg.name}"`);
+    this.logger.info(`Updating "${pkg.name}" addon after registry change`);
     let addon = await this.findOrCreateAddon(pkg);
     await this.updateVersions(addon, pkg);
     await this.updateVersionAliases(addon, pkg);
@@ -98,7 +98,7 @@ export default class RegistryFollowerService extends Service {
     let newVersionMetadatas = await this.filterOutExistingVersions(addon, pkg.versions);
     for (let versionName in newVersionMetadatas) {
       let versionMetadata = newVersionMetadatas[versionName];
-      this.logger.info(`Found a new published version for "${addon.name}": ${versionMetadata.version}`);
+      this.logger.info(`New version published for "${addon.name}": ${versionMetadata.version}`);
       let newVersion = await Version.createFromVersionMetadata(addon, versionMetadata);
       await this.uploadVersion(addon, newVersion);
     }
@@ -116,7 +116,7 @@ export default class RegistryFollowerService extends Service {
     let addonName = pkg.name;
     let addon = <Addon>await Addon.find(addonName);
     if (addon === null) {
-      this.logger.info(`Found a new addon: "${ pkg.name }`);
+      this.logger.info(`New addon published: "${ pkg.name }`);
       addon = await Addon.createFromPackageMetadata(pkg);
     }
     return addon;
@@ -129,13 +129,12 @@ export default class RegistryFollowerService extends Service {
   }
 
   private async uploadVersion(addon: Addon, version: Version) {
-    this.logger.info(`Downloading tarball for ${ addon.name }@${ version.version }`);
     let dir = await downloadTarball(version.tarballUrl);
     if (this.hasDocs(dir)) {
-      this.logger.info(`${ addon.name }@${ version.version } has docs, uploading`);
+      this.logger.info(`${ addon.name }@${ version.version } has precompiled docs, uploading`);
       await this.saveDocs(addon, version, dir);
     } else {
-      this.logger.info(`${ addon.name }@${ version.version } has no docs, skipping`);
+      this.logger.info(`${ addon.name }@${ version.version } has no precompiled docs, skipping`);
     }
   }
 
@@ -145,7 +144,6 @@ export default class RegistryFollowerService extends Service {
   }
 
   private async saveDocs(addon: Addon, version: Version, dir: string): Promise<void> {
-    this.logger.info(`Uploading docs for ${ addon.name }@${ version.version }`);
     await this.files.save('denali-docs', `${ addon.name }/release-${ version.version }/docs.json`, readStream(path.join(dir, 'dist', 'docs.json')));
   }
 

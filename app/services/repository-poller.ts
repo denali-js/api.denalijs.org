@@ -27,7 +27,6 @@ export default class RepoPollerService extends Service {
   }
 
   private async checkNextAddon() {
-    this.logger.info(`Polling for next addon`);
     let addon = await this.getLeastRecentlyCheckedAddon();
     if (!addon) {
       // If we boot up faster than the registry-follower on a fresh DB, there
@@ -37,7 +36,6 @@ export default class RepoPollerService extends Service {
     }
     this.logger.info(`"${ addon.name }" is the most stale addon, checking for any Github updates to release branches`);
 
-    this.logger.info(`Updating ${addon.name}'s docs config from it's master branch`);
     let config = await addon.fetchAndUpdateDocsConfig();
 
     // Get the list of branches currently in the Github repo
@@ -82,7 +80,6 @@ export default class RepoPollerService extends Service {
     let versionBranches = allBranches.filter((branch) => {
       return semver.valid(branch.name) || config.branches.find((c) => c.branchName === branch.name);
     });
-    this.logger.info(`${ addon.name } has ${ versionBranches.length } version branches`);
     return versionBranches;
   }
 
@@ -105,8 +102,6 @@ export default class RepoPollerService extends Service {
     if (branchVersion.lastSeenCommit !== branch.commit.sha) {
       this.logger.info(`${ addon.name } has updated branch ${ branch.name } on Github since our last check`);
       await this.updateDocsFromBranch(addon, branchVersion, branch);
-    } else {
-      this.logger.info(`${ addon.name }'s "${ branch.name }" branch has no change since our last check, skipping`);
     }
   }
 
@@ -147,8 +142,8 @@ export default class RepoPollerService extends Service {
   private loadDocsConfig(dir: string): DocsConfig {
     let config: DocsConfig;
     try {
-      this.logger.info(`Trying to load docs config from ${ dir }`);
       config = Object.assign({}, DEFAULT_DOCS_CONFIG, require(path.join(dir, 'config', 'docs.json')));
+      this.logger.info('Loaded docs config from source');
     } catch (e) {
       this.logger.info(`No docs config found in ${ dir }, falling back to defaults`);
       config = DEFAULT_DOCS_CONFIG;
@@ -157,7 +152,6 @@ export default class RepoPollerService extends Service {
   }
 
   private async saveDocs(addon: Addon, branchVersion: Version, docs: ExtractedDocs) {
-    this.logger.info(`Uploading docs for ${ addon.name } branch "${ branchVersion.branchName }"`);
     let filepath = `${ addon.name }/branch-${ branchVersion.branchName }/docs.json`;
     branchVersion.docsUrl = await this.files.save('denali-docs', filepath, JSON.stringify(docs));
   }
@@ -169,7 +163,6 @@ export default class RepoPollerService extends Service {
     let timeLeft = resetsAt - moment().unix();
     let minimumInterval = this.config.get('environment') === 'production' ? 2 : 20;
     let safeInterval = Math.max(minimumInterval, timeLeft / safeRequestsRemaining);
-    this.logger.info(`${ timeLeft }s left in rate limit window, ${ safeRequestsRemaining } requests available; scheduling next update for ${ safeInterval.toFixed(3) }s from now`);
     setTimeout(this.checkNextAddon.bind(this), safeInterval * 1000);
   }
 
