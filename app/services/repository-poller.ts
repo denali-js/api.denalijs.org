@@ -123,8 +123,6 @@ export default class RepoPollerService extends Service {
       // nothing for now
       // TODO: log it out or warn somehow
     }
-    this.logger.info(branchVersion);
-    this.logger.info(branchVersion.docsUrl);
     branchVersion.lastSeenCommit = branch.commit.sha;
     branchVersion.compiledAt = new Date();
     await branchVersion.save();
