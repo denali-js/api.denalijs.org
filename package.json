@@ -12,7 +12,7 @@
   "dependencies": {
     "@denali-js/cli": "0.1.2",
     "@denali-js/core": "0.1.2",
-    "@denali-js/documenter": "^1.0.5",
+    "@denali-js/documenter": "^2.0.0",
     "@denali-js/typescript": "^0.1.1",
     "@types/moment": "^2.13.0",
     "@types/node-fetch": "^1.6.7",
