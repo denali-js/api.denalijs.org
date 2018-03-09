@@ -18,6 +18,8 @@ export default class ShowVersion extends ApplicationAction {
       }
       version = await versionAlias.getVersion();
     }
+    // If an alias was used to fetch this version, then use the alias as the displayName
+    version.displayName = query.version;
     return version;
   }
 
