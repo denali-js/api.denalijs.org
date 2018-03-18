@@ -1,4 +1,4 @@
-import { lookup, Logger, attr, hasMany } from '@denali-js/core';
+import { lookup, Logger } from '@denali-js/core';
 import fetchPackage from 'package-json';
 import semver from 'semver';
 import ApplicationModel from './application';
@@ -21,19 +21,19 @@ const logger = lookup<Logger>('app:logger');
 
 export default class Addon extends ApplicationModel {
 
+  static tableName = 'addons';
   static idColumn = 'name';
 
-  static get schema() {
-    return Object.assign(super.schema, {
-      name: attr('string'),
-      description: attr('string'),
-      repoSlug: attr('string'),
-      docsVersionGranularity: attr('string'),
-      docsVersionStrategy: attr('string'),
-      docsSemverBranches: attr('boolean'),
-      versions: hasMany('version')
-    });
-  }
+  static relationMappings = {
+    versions: {
+      relation: ApplicationModel.HasManyRelation,
+      modelClass: `${ __dirname }/version`,
+      join: {
+        from: 'addon.name',
+        to: 'version.addonId'
+      }
+    }
+  };
 
   static createFromPackageMetadata(pkg: PackageMetadata): Promise<Addon> {
     let latestVersionName = pkg['dist-tags'].latest;
@@ -50,7 +50,7 @@ export default class Addon extends ApplicationModel {
       let match = repository.url.match(/github.com\/([^\/]+\/[^\/]+?)(?:\.git)?$/);
       repoSlug = match && match[1];
     }
-    return this.create({
+    return this.query().insert({
       name: pkg.name,
       description: pkg.description,
       repoSlug
@@ -59,15 +59,14 @@ export default class Addon extends ApplicationModel {
 
   name: string;
   description: string;
-  repoSlug: string;
+  repoSlug: string | null;
+
+  versions: Version[];
 
   // Docs config
   docsGranularity: DocsConfig['granularity'];
   docsVersionStrategy: DocsConfig['versionStrategy'];
   docsSemverBranches: boolean;
-
-  getVersions: (query: any) => Version[];
-  addVersion: (version: Version) => Promise<void>;
 
   /**
    * Fetch config/docs.json for this addon from it's master branch on Github,
@@ -84,10 +83,6 @@ export default class Addon extends ApplicationModel {
       config = Object.assign({}, DEFAULT_DOCS_CONFIG);
     }
 
-    this.docsGranularity = config.granularity;
-    this.docsVersionStrategy = config.versionStrategy;
-    this.docsSemverBranches = config.semverBranches;
-
     config.branches.forEach(({ branchName, displayName }) => {
       if (displayName) {
         VersionAlias.createOrUpdate(displayName, branchName, this);
@@ -95,7 +90,12 @@ export default class Addon extends ApplicationModel {
       // TODO: create branch versions here if they don't already exist
     });
 
-    await this.save();
+    await Addon.query().patchAndFetchById(this.id, {
+      docsGranularity: config.granularity,
+      docsVersionStrategy: config.versionStrategy,
+      docsSemverBranches: config.semverBranches
+    });
+
     return config;
   }
 
@@ -138,7 +138,7 @@ export default class Addon extends ApplicationModel {
 
     // (2) A semver-named branch exists which satisfies the currently published
     // 'latest' dist-tag version
-    let allVersions = await Version.query({ addon_id: this.id });
+    let allVersions = await Version.query().where({ addonId: this.id });
     let branchMatchingLatestDistTag = allVersions.find((v) => semver.satisfies(latestDistTag, v.branchName));
     if (branchMatchingLatestDistTag) {
       logger.info(`${ this.name } 'latest' will point to ${ branchMatchingLatestDistTag.branchName } branch on Github because that branch satisfies the current 'latest' dist-tag on npm`);

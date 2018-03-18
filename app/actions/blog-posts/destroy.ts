@@ -5,11 +5,11 @@ import BlogPost from '../../models/blog-post';
 export default class DestroyBlogPost extends ApplicationAction {
 
   async respond({ params }: { params: { id: string | number } }) {
-    let blogPost = await BlogPost.find(params.id);
+    let blogPost = await BlogPost.query().findById(params.id);
     if (!blogPost) {
       throw new Errors.NotFound();
     }
-    await blogPost.delete();
+    await BlogPost.query().deleteById(blogPost.id);
     this.render(204);
   }
 

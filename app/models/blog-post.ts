@@ -1,13 +1,11 @@
-import { attr } from '@denali-js/core';
-import ApplicationModel from './application';
+import { Model } from 'objection';
 
-export default class BlogPost extends ApplicationModel {
+export default class BlogPost extends Model {
 
-  static get schema() {
-    return Object.assign(super.schema, {
-      title: attr('string'),
-      body: attr('string')
-    });
-  }
+  static tableName = 'blog_posts';
+
+  id: number;
+  title: string;
+  body: string;
 
 }

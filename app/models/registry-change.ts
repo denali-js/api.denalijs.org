@@ -1,27 +1,13 @@
-import { attr } from '@denali-js/core';
-import { ObjectionAdapter } from 'denali-objection';
 import ApplicationModel from './application';
 
 export default class RegistryChange extends ApplicationModel {
 
-  static get raw() {
-    return (<ObjectionAdapter>this.adapter).objectionModels[this.modelName].query();
-  }
-
-  static get schema() {
-    return Object.assign(super.schema, {
-      lastHandledSequence: attr('number')
-    });
-  }
-
   static async updateLastSequence(seq: number) {
-    await this.raw
-          .patch(<any>{ last_handled_sequence: seq })
-          .where('last_handled_sequence', '<', seq);
+    await this.query().patchAndFetchById(1, { lastHandledSequence: seq });
   }
 
   static async getLastSequence(): Promise<number | null> {
-    let record = (await this.all())[0];
+    let record = await RegistryChange.query().findById(1);
     if (record) {
       return record.lastHandledSequence;
     }

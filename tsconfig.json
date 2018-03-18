@@ -15,7 +15,8 @@
       "noUnusedLocals": true,
       "baseUrl": ".",
       "esModuleInterop": true,
-      "strictNullChecks": true
+      "strictNullChecks": true,
+      "experimentalDecorators": true
   },
   "include": [
     "lib/**/*",

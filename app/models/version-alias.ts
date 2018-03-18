@@ -1,4 +1,4 @@
-import { attr, hasOne, lookup, Logger } from '@denali-js/core';
+import { lookup, Logger } from '@denali-js/core';
 import ApplicationModel from './application';
 import Version from './version';
 import Addon from './addon';
@@ -7,38 +7,45 @@ const logger = lookup<Logger>('app:logger');
 
 export default class VersionAlias extends ApplicationModel {
 
-
-  static get schema() {
-    return Object.assign(super.schema, {
-      alias: attr('string'),
-      version: hasOne('version'),
-      addon: hasOne('addon')
-    });
-  }
+  static relationMappings = {
+    addon: {
+      relation: ApplicationModel.BelongsToOneRelation,
+      modelClass: `${ __dirname }/addon`,
+      join: {
+        from: 'versionAlias.addonId',
+        to: 'addon.name'
+      }
+    },
+    version: {
+      relation: ApplicationModel.BelongsToOneRelation,
+      modelClass: `${ __dirname }/version`,
+      join: {
+        from: 'versionAlias.versionId',
+        to: 'version.id'
+      }
+    }
+  };
 
   static async createOrUpdate(aliasName: string, versionName: string, addon: Addon) {
-    let version = await Version.queryOne({ version: versionName, addon_id: addon.id });
+    let version = await Version.query().findOne({ version: versionName, addon_id: addon.id });
     if (!version) {
       logger.warn(`Unable to create a version alias from ${ aliasName } -> ${ versionName }: "${ versionName }" version does not exist`);
       return;
     }
     let alias: VersionAlias;
-    let existingAlias = await this.queryOne({ alias: aliasName, addon_id: addon.id });
+    let existingAlias = await VersionAlias.query().findOne({ alias: aliasName, addon_id: addon.id });
     if (!existingAlias) {
-      alias = await this.create({ alias: aliasName });
+      alias = await VersionAlias.query().insert({ alias: aliasName });
     } else {
       alias = existingAlias;
-      alias.alias = aliasName;
+      await VersionAlias.query().patchAndFetchById(alias.id, { alias: aliasName });
     }
-    await alias.setVersion(version);
-    await alias.setAddon(addon);
-    await alias.save();
+    await alias.$setRelated('version', version)
+               .$setRelated('addon', addon);
   }
 
   alias: string;
-  getVersion: () => Version;
-  setVersion: (version: Version) => void;
-  getAddon: () => Addon;
-  setAddon: (addon: Addon) => void;
+  version: Version;
+  addon: Addon;
 
 }

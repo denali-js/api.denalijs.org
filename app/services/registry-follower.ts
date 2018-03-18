@@ -114,8 +114,8 @@ export default class RegistryFollowerService extends Service {
 
   private async findOrCreateAddon(pkg: PackageMetadata) {
     let addonName = pkg.name;
-    let addon = <Addon>await Addon.find(addonName);
-    if (addon === null) {
+    let addon = await Addon.query().findById(addonName);
+    if (addon == null) {
       this.logger.info(`New addon published: "${ pkg.name }`);
       addon = await Addon.createFromPackageMetadata(pkg);
     }
@@ -123,7 +123,7 @@ export default class RegistryFollowerService extends Service {
   }
 
   private async filterOutExistingVersions(addon: Addon, versionMetadatas: Dict<VersionMetadata>) {
-    let existingVersionRecords = await addon.getVersions({ is_branch: false });
+    let existingVersionRecords = await addon.$relatedQuery('versions').where({ is_branch: false });
     let existingVersions = existingVersionRecords.map((version) => version.version);
     return omit(versionMetadatas, existingVersions);
   }

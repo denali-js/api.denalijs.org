@@ -1,23 +1,19 @@
-import { Model, attr } from '@denali-js/core';
+import { Model, snakeCaseMappers } from 'objection';
 
 export default class ApplicationModel extends Model {
 
-  static abstract = true;
+  static columnNameMappers = snakeCaseMappers();
 
-  static get schema() {
-    return {
-      createdAt: attr('date'),
-      updatedAt: attr('date')
-    };
-  }
-
+  id: number;
   createdAt: Date;
   updatedAt: Date;
 
-  save() {
-    this.createdAt = this.createdAt || new Date();
+  $beforeInsert() {
+    this.createdAt = new Date();
+  }
+
+  $afterInsert() {
     this.updatedAt = new Date();
-    return super.save();
   }
 
 }

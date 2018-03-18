@@ -10,13 +10,13 @@ export default class ShowVersion extends ApplicationAction {
   async respond({ query }: { query: { addon: string, version: string} }) {
     assert(query.addon, `You must include which addon to fetch: ${ inspect(query) }`);
     assert(query.version, `You must include which version to fetch: ${ inspect(query) }`);
-    let version = await Version.queryOne({ addon_id: query.addon, version: query.version });
+    let version = await Version.query().findOne({ addon_id: query.addon, version: query.version });
     if (!version) {
-      let versionAlias = await VersionAlias.queryOne({ alias: query.version, addon_id: query.addon });
+      let versionAlias = await VersionAlias.query().findOne({ alias: query.version, addon_id: query.addon });
       if (!versionAlias) {
         throw new Errors.NotFound(`Version not found (addon: "${ query.addon }", version: "${ query.version }")`);
       }
-      version = await versionAlias.getVersion();
+      version = await versionAlias.$relatedQuery('version');
     }
     // If an alias was used to fetch this version, then use the alias as the displayName
     version.displayName = query.version;

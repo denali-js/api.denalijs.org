@@ -4,7 +4,6 @@ import assert from 'assert';
 import { inspect } from 'util';
 import { Service, lookup, ConfigService } from '@denali-js/core';
 import moment = require('moment');
-import { QueryBuilder } from 'knex';
 import * as semver from 'semver';
 import fetch from 'node-fetch';
 import { differenceWith, flip, intersectionWith } from 'lodash';
@@ -68,9 +67,8 @@ export default class RepoPollerService extends Service {
   }
 
   private async getLeastRecentlyCheckedAddon() {
-    return await Addon.queryOne(async (objection: QueryBuilder) => {
-      return objection.whereNotNull('repo_slug').orderBy('updated_at').limit(1);
-    });
+    let results = await Addon.query().whereNotNull('repoSlug').orderBy('updatedAt').limit(1);
+    return results[0];
   }
 
   private async getBranches(addon: Addon, config: DocsConfig): Promise<GithubBranchData[]> {
@@ -84,12 +82,12 @@ export default class RepoPollerService extends Service {
   }
 
   private async getBranchVersions(addon: Addon): Promise<Version[]> {
-    return await addon.getVersions({ is_branch: true });
+    return await addon.$relatedQuery('versions').where({ isBranch: true });
   }
 
   private async deleteBranchVersion(addon: Addon, branchVersion: Version): Promise<void> {
     this.logger.info(`${ addon.name } has deleted it's ${ branchVersion.branchName } on Github, deleting our corresponding branch Version`);
-    await branchVersion.delete();
+    await Version.query().deleteById(branchVersion.id);
   }
 
   private async createBranchVersion(addon: Addon, config: BranchConfig | undefined, branch: GithubBranchData): Promise<void> {
@@ -118,9 +116,10 @@ export default class RepoPollerService extends Service {
       // nothing for now
       // TODO: log it out or warn somehow
     }
-    branchVersion.lastSeenCommit = branch.commit.sha;
-    branchVersion.compiledAt = new Date();
-    await branchVersion.save();
+    await Version.query().patchAndFetchById(branchVersion.id, {
+      lastSeenCommit: branch.commit.sha,
+      compiledAt: new Date()
+    });
   }
 
   private async buildDocs(addon: Addon, version: string, dir: string) {
